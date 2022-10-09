@@ -1,9 +1,6 @@
 <?php
 
-namespace base;
-
-use controllers\ErrorController;
-use base\PrintException;
+namespace Base;
 
 /**
  * Класс для взаимодействия с базой данных
@@ -11,6 +8,9 @@ use base\PrintException;
  */
 class DBQuery 
 {
+    const ERR_MESSAGE_MULTIPLE_FIELDS = "В запросе извлекается несколько полей";
+    const ERR_MESSAGE_MULTIPLE_LINES = "Запрос извлекает более одной строки";
+    
     private \PDO $dbh;
 
     public function __construct(object $db) 
@@ -19,7 +19,7 @@ class DBQuery
         try {
             $this->dbh = new \PDO($db->dsn, $db->username, $db->password, [\PDO::ATTR_PERSISTENT => true]);
         } catch(\PDOException $e) {
-            echo (new ErrorController())->indexAction("Ошибка соединения с базой данны: " . $e->getMessage());
+            echo "Ошибка соединения с базой данны: " . $e->getMessage();
             exit();
         }
         // Установить исключения при ошибках в базе данных
@@ -44,7 +44,7 @@ class DBQuery
      * @param string $sql - строка запроса
      * @param array $params - параметры запроса
      * @return string
-     * @throws PrintException
+     * @throws Exception
      */
     public function selectValue(string $sql, array $params): string
     {
@@ -53,12 +53,12 @@ class DBQuery
         $result = $sth->fetch(\PDO::FETCH_NUM);
         
         if (is_array($result) && count($result) !== 1) {
-            throw new PrintException("В запросе извлекается несколько полей");
+            throw new \Exception(self::ERR_MESSAGE_MULTIPLE_FIELDS);
         }
         
         // Пытаемся извлечь ещё одну строку. Если получается, то бросаем исключение
         if ($sth->fetch(\PDO::FETCH_NUM)) {
-            throw new PrintException("Запрос извлекает более одной строки");
+            throw new \Exception(self::ERR_MESSAGE_MULTIPLE_LINES);
         }
         
         // Если запрос извлёк одну строку, возвращаем величину извлечённого поля.
