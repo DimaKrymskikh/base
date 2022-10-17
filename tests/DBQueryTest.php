@@ -6,7 +6,7 @@ use Base\DBQuery;
 
 class DBQueryTest extends TestCase
 {
-    public static DBQuery $db;
+    private static DBQuery $db;
     
     public static function setUpBeforeClass(): void
     {
