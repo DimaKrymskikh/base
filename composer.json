@@ -3,7 +3,8 @@
     "type": "library",
     "autoload": {
         "psr-4": {
-            "Base\\": "src/"
+            "Base\\": "src/",
+            "Tests\\": "tests/"
         }
     },
     "require-dev": {

@@ -16,7 +16,7 @@ use Lcobucci\JWT\Token as TokenInterface;
  * @property Builder $tokenBuilder
  * @property Sha256 $algorithm Используемый алгоритм при создании токена
  * @property InMemory $signingKey Особый формат хранения секретного ключа
- * @property string $secretKey Секретный ключ, должен быть в формат MIME base64
+ * @property string $secretKey Секретный ключ, должен быть в формате MIME base64
  * @property string $iss URI стороны, генерирующей токен
  * @property string $aud URI стороны, принимающей токен
  * @property ?string $jti Строка, определяющая уникальный идентификатор данного токена (по-моему, без $jti можно обойтись)
