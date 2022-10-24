@@ -4,7 +4,6 @@ namespace Base;
 
 /**
  * @property private array $routers
- * @property private string $namespaceControllers Пространство имён, в котором хранятся контроллеры
  * @property private object $error Содержит контроллер и экшен, которые используются, когда указан неверный путь и/или метод
  */
 class Router 
@@ -12,7 +11,6 @@ class Router
     private array $routers = [];
 
     public function __construct(
-            private string $namespaceControllers,
             private object $error
     ) 
     {
@@ -63,7 +61,7 @@ class Router
         
         // Если полученног $uri нет в массиве маршрутов, то выполняем дефолтный экшен (задаётся в приложении)
         if (!$isFind) {
-            $errorController = $this->namespaceControllers . '\\' . $this->error->controller;
+            $errorController = $this->error->controller;
             echo [new $errorController, $this->error->action]();
         }
     }
@@ -129,7 +127,7 @@ class Router
         return (object) [
             'method' => $method,
             'pattern' => $pattern,
-            'controller' => $this->namespaceControllers . '\\' . $controller,
+            'controller' => $controller,
             'action' => $action
         ];
     }

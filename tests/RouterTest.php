@@ -2,6 +2,9 @@
 
 use PHPUnit\Framework\TestCase;
 use Base\Router;
+use Tests\Controllers\FooController;
+use Tests\Controllers\BarController;
+use Tests\Controllers\ErrorController;
 
 class RouterTest extends TestCase
 {
@@ -9,22 +12,22 @@ class RouterTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->router = new Router('Tests\Controllers', (object) [
-            'controller' => 'ErrorController',
+        $this->router = new Router((object) [
+            'controller' => ErrorController::class,
             'action' => 'index'
         ]);
         
-        $this->router->get('foo', 'FooController', 'index');
-        $this->router->get('foo/{a}', 'FooController', 'get');
-        $this->router->post('foo/{a}', 'FooController', 'post');
-        $this->router->put('foo/{a}/{b}', 'FooController', 'put');
-        $this->router->delete('foo/{a}/str/{b}', 'FooController', 'delete');
+        $this->router->get('foo', FooController::class, 'index');
+        $this->router->get('foo/{a}', FooController::class, 'get');
+        $this->router->post('foo/{a}', FooController::class, 'post');
+        $this->router->put('foo/{a}/{b}', FooController::class, 'put');
+        $this->router->delete('foo/{a}/str/{b}', FooController::class, 'delete');
         
-        $this->router->get('bar', 'BarController');
-        $this->router->get('bar/str/{a}', 'BarController', 'get');
-        $this->router->post('bar/str/{a}/str2/{b}/{c}/str3', 'BarController', 'post');
-        $this->router->put('bar/str/{a}/str2/str3', 'BarController', 'put');
-        $this->router->delete('bar/{a}/{b}/str2/str3', 'BarController', 'delete');
+        $this->router->get('bar', BarController::class);
+        $this->router->get('bar/str/{a}', BarController::class, 'get');
+        $this->router->post('bar/str/{a}/str2/{b}/{c}/str3', BarController::class, 'post');
+        $this->router->put('bar/str/{a}/str2/str3', BarController::class, 'put');
+        $this->router->delete('bar/{a}/{b}/str2/str3', BarController::class, 'delete');
     }
     
     public function testFoo() 
