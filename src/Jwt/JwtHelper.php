@@ -60,7 +60,9 @@ class JwtHelper
      */
     public static function generateToken(string $secretKey, string $iss, string $aud, ?string $jti, int $uid, ?string $nbfStep, string $expStep): TokenInterface
     {
-        $iat = new \DateTimeImmutable('now', new \DateTimeZone('Asia/Novosibirsk'));
+        // Нет смысла указывать часовой пояс, потому что Lcobucci\JWT за ним не следит.
+        // $token->claims()->get('iat') возвращает дату с дефолтным часовым поясом.
+        $iat = new \DateTimeImmutable();
         $nbf = $nbfStep ? $iat->modify($nbfStep) : null;
         $exp = $iat->modify($expStep);
         
