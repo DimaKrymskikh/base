@@ -23,7 +23,7 @@ use Lcobucci\JWT\Token as TokenInterface;
  * @property int $uid Индентификатор пользователя из базы данных
  * @property \DateTimeImmutable $iat Время, определяющее момент, когда токен был создан
  * @property ?\DateTimeImmutable $nbf Время, определяющее момент, когда токен станет валидным
- * @property \DateTimeImmutable $exp Время, определяющее момент, когда токен станет невалидным
+ * @property ?\DateTimeImmutable $exp Время, определяющее момент, когда токен станет невалидным
  */
 class JwtHelper 
 {
@@ -38,8 +38,8 @@ class JwtHelper
             private ?string $jti, 
             private int $uid, 
             private \DateTimeImmutable $iat, 
-            private ?\DateTimeImmutable $nbf,
-            private \DateTimeImmutable $exp
+            private ?\DateTimeImmutable $nbf = null,
+            private ?\DateTimeImmutable $exp = null
     )
     {
         $this->tokenBuilder = new Builder(new JoseEncoder(), ChainedFormatter::default());
@@ -58,13 +58,13 @@ class JwtHelper
      * @param string $expStep
      * @return TokenInterface
      */
-    public static function generateToken(string $secretKey, string $iss, string $aud, ?string $jti, int $uid, ?string $nbfStep, string $expStep): TokenInterface
+    public static function generateToken(string $secretKey, string $iss, string $aud, ?string $jti, int $uid, ?string $nbfStep = null, ?string $expStep = null): TokenInterface
     {
         // Нет смысла указывать часовой пояс, потому что Lcobucci\JWT за ним не следит.
         // $token->claims()->get('iat') возвращает дату с дефолтным часовым поясом.
         $iat = new \DateTimeImmutable();
         $nbf = $nbfStep ? $iat->modify($nbfStep) : null;
-        $exp = $iat->modify($expStep);
+        $exp = $expStep ? $iat->modify($expStep) : null;
         
         return (new static($secretKey, $iss, $aud, $jti, $uid, $iat, $nbf, $exp))->getToken();
     }
@@ -116,19 +116,22 @@ class JwtHelper
             ->permittedFor($this->aud)
             // Configures the time that the token was issue (iat claim)
             ->issuedAt($this->iat)
-            // Configures the expiration time of the token (exp claim)
-            ->expiresAt($this->exp)
             // Configures a new claim, called "uid"
             ->withClaim('uid', $this->uid);
         
         // Configures the id (jti claim)
-        if($this->jti) {
+        if ($this->jti) {
             $this->tokenBuilder = $this->tokenBuilder->identifiedBy($this->jti);
         }
         
         // Configures the time that the token can be used (nbf claim)
-        if($this->nbf) {
+        if ($this->nbf) {
             $this->tokenBuilder = $this->tokenBuilder->canOnlyBeUsedAfter($this->nbf);
+        }
+        
+        // Configures the expiration time of the token (exp claim)
+        if ($this->exp) {
+            $this->tokenBuilder = $this->tokenBuilder->expiresAt($this->exp);
         }
         
         // Builds a new token
