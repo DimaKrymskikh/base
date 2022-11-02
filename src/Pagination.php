@@ -5,11 +5,11 @@ namespace Base;
 /**
  * Класс реализующий пагинацию
  * В пагинации должно быть нечётное число кнопок
- * @property-read int $activePage - номер активной страницы документа
- * @property-read int $itemsNumberOnPage - планируемое число элементов на странице
- * @property-read int $pagesNumber - число страниц документа
- * @property-read int $firstButton - первая кнопка пагинации
- * @property-read int $lastButton - последняя кнопка пагинации
+ * @property int $activePage - номер активной страницы документа
+ * @property int $itemsNumberOnPage - планируемое число элементов на странице
+ * @property int $pagesNumber - число страниц документа
+ * @property int $firstButton - первая кнопка пагинации
+ * @property int $lastButton - последняя кнопка пагинации
  */
 class Pagination 
 {
@@ -20,11 +20,11 @@ class Pagination
     // Дефолтное значение числа кнопок пагинации
     const DEFAULT_BUTTONS_NUMBER = 5;
     
-    public readonly int $activePage;
-    public readonly int $itemsNumberOnPage;
-    public readonly int $pagesNumber;
-    public readonly int $firstButton;
-    public readonly int $lastButton;
+    private int $activePage;
+    private int $itemsNumberOnPage;
+    private int $pagesNumber;
+    private int $firstButton;
+    private int $lastButton;
 
     /**
      * Задаются свойства пагинации
@@ -82,5 +82,20 @@ class Pagination
     public static function getElementsNumberOnActivePage(int $activePage, int $itemsNumberOnPage, int $itemsNumberTotal): int
     {
         return min($itemsNumberOnPage, $itemsNumberTotal - ($activePage - 1) * $itemsNumberOnPage);
+    }
+    
+    /**
+     * Возвращает свойства класса Pagination, собранные в object
+     * @return object
+     */
+    public function get(): object
+    {
+        return (object)[
+            'activePage' => $this->activePage,
+            'itemsNumberOnPage' => $this->itemsNumberOnPage,
+            'pagesNumber' => $this->pagesNumber,
+            'firstButton' => $this->firstButton,
+            'lastButton' => $this->lastButton
+        ];
     }
 }

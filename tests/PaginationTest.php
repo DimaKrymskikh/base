@@ -13,7 +13,7 @@ class PaginationTest extends TestCase
     public function testConstruct()
     {
         // Конструктор с дефолтным параметром
-        $pag1 = new Pagination(2, 10, 77);
+        $pag1 = (new Pagination(2, 10, 77))->get();
         // Проверка номера активной страницы
         $this->assertEquals(2, $pag1->activePage);
         // Число страниц текста, когда деление с остатком
@@ -24,7 +24,7 @@ class PaginationTest extends TestCase
         $this->assertEquals(4, $pag1->lastButton);
         
         // Конструктор с 4 параметрами
-        $pag2 = new Pagination(4, 20, 120, 7);
+        $pag2 = (new Pagination(4, 20, 120, 7))->get();
         // Проверка номера активной страницы
         $this->assertEquals(4, $pag2->activePage);
         // Число страниц текста, когда деление без остатка
@@ -35,7 +35,7 @@ class PaginationTest extends TestCase
         $this->assertEquals(6, $pag2->lastButton);
 
         // Пагинация для документа с одной страницей
-        $pag3 = new Pagination(1, 20, 3);
+        $pag3 = (new Pagination(1, 20, 3))->get();
         // Проверка номера активной страницы
         $this->assertEquals(1, $pag3->activePage);
         // Число страниц текста (число элементов на странице не больше числа элементов во всём документе)
@@ -46,7 +46,7 @@ class PaginationTest extends TestCase
         $this->assertEquals(1, $pag3->lastButton);
 
         // Пагинация для документа без элементов
-        $pag4 = new Pagination(1, 20, 0);
+        $pag4 = (new Pagination(1, 20, 0))->get();
         // Проверка номера активной страницы
         $this->assertEquals(0, $pag4->activePage);
         // Число страниц текста (число элементов на странице не больше числа элементов во всём документе)
