@@ -14,51 +14,75 @@ class PaginationTest extends TestCase
     {
         // Конструктор с дефолтным параметром
         $pag1 = (new Pagination(2, 10, 77))->get();
-        // Проверка номера активной страницы
+        // 2 - номер активной страницы
         $this->assertEquals(2, $pag1->activePage);
-        // Число страниц текста, когда деление с остатком
+        // 10 - заданное число элементов на странице
+        $this->assertEquals(10, $pag1->itemsNumberOnPage);
+        // 77 - общее число элементов
+        $this->assertEquals(77, $pag1->itemsNumberTotal);
+        // 8 - число страниц текста (деление с остатком)
         $this->assertEquals(8, $pag1->pagesNumber);
-        // Нахождение 1-й страницы
+        // 1 - номер страницы, на которую указывает первая кнопка пагинации
         $this->assertEquals(1, $pag1->firstButton);
-        // Нахождение последней страницы
+        // 4 - номер страницы, на которую указывает последняя кнопка пагинации
         $this->assertEquals(4, $pag1->lastButton);
+        // 10 - найденное число элементов на активной странице (может быть меньше itemsNumberOnPage)
+        $this->assertEquals(10, $pag1->elementsNumberOnActivePage);
         
         // Конструктор с 4 параметрами
         $pag2 = (new Pagination(4, 20, 120, 7))->get();
-        // Проверка номера активной страницы
+        // 4 - номер активной страницы
         $this->assertEquals(4, $pag2->activePage);
-        // Число страниц текста, когда деление без остатка
+        // 20 - заданное число элементов на странице
+        $this->assertEquals(20, $pag2->itemsNumberOnPage);
+        // 120 - общее число элементов
+        $this->assertEquals(120, $pag2->itemsNumberTotal);
+        // 6 - число страниц текста (деление без остатка)
         $this->assertEquals(6, $pag2->pagesNumber);
-        // Нахождение 1-й страницы
+        // 1 - номер страницы, на которую указывает первая кнопка пагинации
         $this->assertEquals(1, $pag2->firstButton);
-        // Нахождение последней страницы
+        // 6 - номер страницы, на которую указывает последняя кнопка пагинации
         $this->assertEquals(6, $pag2->lastButton);
+        // 20 - найденное число элементов на активной странице (может быть меньше itemsNumberOnPage)
+        $this->assertEquals(20, $pag2->elementsNumberOnActivePage);
 
         // Пагинация для документа с одной страницей
         $pag3 = (new Pagination(1, 20, 3))->get();
-        // Проверка номера активной страницы
+        // 1 - номер активной страницы
         $this->assertEquals(1, $pag3->activePage);
-        // Число страниц текста (число элементов на странице не больше числа элементов во всём документе)
+        // 20 - заданное число элементов на странице
+        $this->assertEquals(20, $pag3->itemsNumberOnPage);
+        // 3 - общее число элементов
+        $this->assertEquals(3, $pag3->itemsNumberTotal);
+        // 1 - число страниц текста
         $this->assertEquals(1, $pag3->pagesNumber);
-        // Нахождение 1-й страницы
+        // 1 - номер страницы, на которую указывает первая кнопка пагинации
         $this->assertEquals(1, $pag3->firstButton);
-        // Нахождение последней страницы
+        // 1 - номер страницы, на которую указывает последняя кнопка пагинации
         $this->assertEquals(1, $pag3->lastButton);
+        // 3 - найденное число элементов на активной странице (может быть меньше itemsNumberOnPage)
+        $this->assertEquals(3, $pag3->elementsNumberOnActivePage);
 
         // Пагинация для документа без элементов
         $pag4 = (new Pagination(1, 20, 0))->get();
-        // Проверка номера активной страницы
+        // 0 - номер активной страницы
         $this->assertEquals(0, $pag4->activePage);
-        // Число страниц текста (число элементов на странице не больше числа элементов во всём документе)
+        // 20 - заданное число элементов на странице
+        $this->assertEquals(20, $pag4->itemsNumberOnPage);
+        // 0 - общее число элементов
+        $this->assertEquals(0, $pag4->itemsNumberTotal);
+        // 0 - число страниц текста
         $this->assertEquals(0, $pag4->pagesNumber);
-        // Нахождение 1-й страницы
+        // 0 - номер страницы, на которую указывает первая кнопка пагинации
         $this->assertEquals(0, $pag4->firstButton);
-        // Нахождение последней страницы
+        // 0 - номер страницы, на которую указывает последняя кнопка пагинации
         $this->assertEquals(0, $pag4->lastButton);
+        // 0 - найденное число элементов на активной странице (может быть меньше itemsNumberOnPage)
+        $this->assertEquals(0, $pag4->elementsNumberOnActivePage);
     }
     
     /**
-     * Проверка нахождения первого и последнего элементов на странице документа
+     * Проверка нахождения первого и последнего элементов на активной странице документа
      */
     public function testElementsOnPage() 
     {
@@ -66,18 +90,5 @@ class PaginationTest extends TestCase
         $this->assertEquals(76, Pagination::from(4, 25));
         // Последний элемент страницы
         $this->assertEquals(100, Pagination::to(4, 25));
-    }
-    
-    /**
-     * Проверка нахождения числа элементов на актвной странице
-     */
-    public function testElementsNumberOnActivePage() 
-    {
-        // Если на одной странице может быть не более 20 элементов,
-        // и общее число элементов равно 21, то
-        // на первой странице будет 20 элементов,
-        $this->assertEquals(20, Pagination::getElementsNumberOnActivePage(1, 20, 21));
-        // а на второй 1 элемент.
-        $this->assertEquals(1, Pagination::getElementsNumberOnActivePage(2, 20, 21));
     }
 }

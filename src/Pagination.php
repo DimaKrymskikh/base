@@ -7,6 +7,7 @@ namespace Base;
  * В пагинации должно быть нечётное число кнопок
  * @property int $activePage - номер активной страницы документа
  * @property int $itemsNumberOnPage - планируемое число элементов на странице
+ * @property int $itemsNumberTotal - общее число элементов документа, к которому применяется пагинация
  * @property int $pagesNumber - число страниц документа
  * @property int $firstButton - первая кнопка пагинации
  * @property int $lastButton - последняя кнопка пагинации
@@ -22,6 +23,7 @@ class Pagination
     
     private int $activePage;
     private int $itemsNumberOnPage;
+    private int $itemsNumberTotal;
     private int $pagesNumber;
     private int $firstButton;
     private int $lastButton;
@@ -40,6 +42,8 @@ class Pagination
         $this->activePage = $itemsNumberTotal ? $activePage : 0;
         // Число эдементов на странице
         $this->itemsNumberOnPage = $itemsNumberOnPage;
+        // Общее число элементов
+        $this->itemsNumberTotal = $itemsNumberTotal;
         // Находим число страниц документа
         $this->pagesNumber = intdiv($itemsNumberTotal, $itemsNumberOnPage) + ($itemsNumberTotal % $itemsNumberOnPage ? 1 : 0);
         // Находим первую кнопку пагинации
@@ -74,14 +78,11 @@ class Pagination
     /**
      * Возвращает число элементов на активной странице
      * На последней странице число элементов может быть меньше $itemsNumberOnPage
-     * @param int $activePage - номер активной страницы
-     * @param int $itemsNumberOnPage - запланированное число элементов на странице
-     * @param int $itemsNumberTotal - число эдементов во всём документе
      * @return int
      */
-    public static function getElementsNumberOnActivePage(int $activePage, int $itemsNumberOnPage, int $itemsNumberTotal): int
+    private function getElementsNumberOnActivePage(): int
     {
-        return min($itemsNumberOnPage, $itemsNumberTotal - ($activePage - 1) * $itemsNumberOnPage);
+        return $this->itemsNumberTotal ? min($this->itemsNumberOnPage, $this->itemsNumberTotal - ($this->activePage - 1) * $this->itemsNumberOnPage) : 0;
     }
     
     /**
@@ -93,9 +94,11 @@ class Pagination
         return (object)[
             'activePage' => $this->activePage,
             'itemsNumberOnPage' => $this->itemsNumberOnPage,
+            'itemsNumberTotal' => $this->itemsNumberTotal,
             'pagesNumber' => $this->pagesNumber,
             'firstButton' => $this->firstButton,
-            'lastButton' => $this->lastButton
+            'lastButton' => $this->lastButton,
+            'elementsNumberOnActivePage' => $this->getElementsNumberOnActivePage($this->activePage, $this->itemsNumberOnPage, $this->itemsNumberTotal)
         ];
     }
 }
