@@ -54,11 +54,11 @@ class JwtHelper
      * @param string $aud
      * @param string|null $jti
      * @param int $uid
-     * @param string|null $nbfStep
+     * @param string $nbfStep
      * @param string $expStep
      * @return TokenInterface
      */
-    public static function generateToken(string $secretKey, string $iss, string $aud, ?string $jti, int $uid, ?string $nbfStep = null, ?string $expStep = null): TokenInterface
+    public static function generateToken(string $secretKey, string $iss, string $aud, ?string $jti, int $uid, ?string $nbfStep = '', ?string $expStep = ''): TokenInterface
     {
         // Нет смысла указывать часовой пояс, потому что Lcobucci\JWT за ним не следит.
         // $token->claims()->get('iat') возвращает дату с дефолтным часовым поясом.
