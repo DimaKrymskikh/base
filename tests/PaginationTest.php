@@ -3,7 +3,6 @@
 use PHPUnit\Framework\TestCase;
 
 use Base\Pagination;
-//use base\PrintException;
 
 class PaginationTest extends TestCase
 {
