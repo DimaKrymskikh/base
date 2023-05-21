@@ -24,7 +24,7 @@ class Router
      */
     public function run(string $method, string $uri): void
     {
-        $arrUri = explode('/', $uri);
+        $arrUri = explode('/', trim($uri, '/'));
         $isFind = false;
         
         // Перебираем все возможные маршруты до первого найденного
@@ -34,7 +34,7 @@ class Router
                 continue;
             }
             // Разбытые на части полученный $uri и паттерн должны иметь равное число частей
-            $arrPattern = explode('/', $router->pattern);
+            $arrPattern = explode('/', trim($router->pattern, '/'));
             if (count($arrUri) !== count($arrPattern)) {
                 continue;
             }

@@ -17,6 +17,7 @@ class RouterTest extends TestCase
             'action' => 'index'
         ]);
         
+        $this->router->get('/', FooController::class, 'index');
         $this->router->get('foo', FooController::class, 'index');
         $this->router->get('foo/{a}', FooController::class, 'get');
         $this->router->post('foo/{a}', FooController::class, 'post');
@@ -28,6 +29,12 @@ class RouterTest extends TestCase
         $this->router->post('bar/str/{a}/str2/{b}/{c}/str3', BarController::class, 'post');
         $this->router->put('bar/str/{a}/str2/str3', BarController::class, 'put');
         $this->router->delete('bar/{a}/{b}/str2/str3', BarController::class, 'delete');
+    }
+    
+    public function testSlash() 
+    {
+        $this->expectOutputString('FooController->index');
+        $this->router->run('GET', '/');
     }
     
     public function testFoo() 

@@ -16,7 +16,7 @@ class Pagination
 {
     // Дефолтное значение номера активной страницы
     const DEFAULT_ACTIVE_PAGE = 1;
-    // Дефолтное значение числа эдементов на странице
+    // Дефолтное значение числа элементов на странице
     const DEFAULT_ITEMS_NUMBER_ON_PAGE = 20;
     // Дефолтное значение числа кнопок пагинации
     const DEFAULT_BUTTONS_NUMBER = 5;
