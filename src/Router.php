@@ -6,14 +6,13 @@ namespace Base;
  * @property private array $routers
  * @property private object $error Содержит контроллер и экшен, которые используются, когда указан неверный путь и/или метод
  */
-class Router 
+class Router
 {
     private array $routers = [];
 
     public function __construct(
-            private object $error
-    ) 
-    {
+        private object $error
+    ) {
     }
 
     /**
@@ -26,7 +25,7 @@ class Router
     {
         $arrUri = explode('/', trim($uri, '/'));
         $isFind = false;
-        
+
         // Перебираем все возможные маршруты до первого найденного
         foreach ($this->routers as $router) {
             // Методы запроса должны совпадать
@@ -46,7 +45,7 @@ class Router
                 if (str_starts_with($part, '{') && str_ends_with($part, '}')) {
                     $arrArg[] = $arrUri[$key];
                     $nCoincidence++;
-                // Если часть паттерна без фигурных скобок, то она должна равняться соответствующей части $uri
+                    // Если часть паттерна без фигурных скобок, то она должна равняться соответствующей части $uri
                 } elseif ($arrPattern[$key] === $arrUri[$key]) {
                     $nCoincidence++;
                 }
@@ -54,20 +53,20 @@ class Router
             // Если по всем частям $uri и патерна найдены совпадения, выполняем экшен
             if ($nCoincidence === count($arrPattern)) {
                 $isFind = true;
-                echo [new $router->controller, $router->action](...$arrArg);
+                echo [new $router->controller(), $router->action](...$arrArg);
                 break;
             }
         }
-        
+
         // Если полученног $uri нет в массиве маршрутов, то выполняем дефолтный экшен (задаётся в приложении)
         if (!$isFind) {
             $errorController = $this->error->controller;
-            echo [new $errorController, $this->error->action]();
+            echo [new $errorController(), $this->error->action]();
         }
     }
-    
+
     /**
-     * Добавляем маршрут с методом 'GET' 
+     * Добавляем маршрут с методом 'GET'
      * @param string $pattern
      * @param string $controller
      * @param string $action
@@ -77,7 +76,7 @@ class Router
     {
         $this->routers[] = $this->getObject('GET', $pattern, $controller, $action);
     }
-    
+
     /**
      * Добавляем маршрут с методом 'POST'
      * @param string $pattern
@@ -89,7 +88,7 @@ class Router
     {
         $this->routers[] = $this->getObject('POST', $pattern, $controller, $action);
     }
-    
+
     /**
      * Добавляем маршрут с методом 'PUT'
      * @param string $pattern
@@ -101,7 +100,7 @@ class Router
     {
         $this->routers[] = $this->getObject('PUT', $pattern, $controller, $action);
     }
-    
+
     /**
      * Добавляем маршрут с методом 'DELETE'
      * @param string $pattern
@@ -113,7 +112,7 @@ class Router
     {
         $this->routers[] = $this->getObject('DELETE', $pattern, $controller, $action);
     }
-    
+
     /**
      * Возвращает объект для добавления в $this->routers
      * @param string $method

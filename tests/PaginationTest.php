@@ -27,7 +27,7 @@ class PaginationTest extends TestCase
         $this->assertEquals(4, $pag1->lastButton);
         // 10 - найденное число элементов на активной странице (может быть меньше itemsNumberOnPage)
         $this->assertEquals(10, $pag1->elementsNumberOnActivePage);
-        
+
         // Конструктор с 4 параметрами
         $pag2 = (new Pagination(4, 20, 120, 7))->get();
         // 4 - номер активной страницы
@@ -79,11 +79,11 @@ class PaginationTest extends TestCase
         // 0 - найденное число элементов на активной странице (может быть меньше itemsNumberOnPage)
         $this->assertEquals(0, $pag4->elementsNumberOnActivePage);
     }
-    
+
     /**
      * Проверка нахождения первого и последнего элементов на активной странице документа
      */
-    public function testElementsOnPage() 
+    public function testElementsOnPage()
     {
         // Первый элемент страницы
         $this->assertEquals(76, Pagination::from(4, 25));

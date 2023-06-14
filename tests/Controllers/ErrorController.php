@@ -2,7 +2,7 @@
 
 namespace Tests\Controllers;
 
-class ErrorController 
+class ErrorController
 {
     public function index(): string
     {

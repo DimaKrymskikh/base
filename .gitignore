@@ -1,3 +1,8 @@
-/nbproject/private/
-/vendor
+# Папка настроек NetBeans
+/nbproject/
+
+# Это генерирует Composer
+/vendor/
+
 .env
+.php-cs-fixer.cache

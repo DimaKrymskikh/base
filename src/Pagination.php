@@ -12,15 +12,15 @@ namespace Base;
  * @property int $firstButton - первая кнопка пагинации
  * @property int $lastButton - последняя кнопка пагинации
  */
-class Pagination 
+class Pagination
 {
     // Дефолтное значение номера активной страницы
-    const DEFAULT_ACTIVE_PAGE = 1;
+    public const DEFAULT_ACTIVE_PAGE = 1;
     // Дефолтное значение числа элементов на странице
-    const DEFAULT_ITEMS_NUMBER_ON_PAGE = 20;
+    public const DEFAULT_ITEMS_NUMBER_ON_PAGE = 20;
     // Дефолтное значение числа кнопок пагинации
-    const DEFAULT_BUTTONS_NUMBER = 5;
-    
+    public const DEFAULT_BUTTONS_NUMBER = 5;
+
     private int $activePage;
     private int $itemsNumberOnPage;
     private int $itemsNumberTotal;
@@ -36,7 +36,7 @@ class Pagination
      * @param int $buttonsNumber - число кнопок пагинации
      * @throws PrintException - выбрасывается при чётном числе кнопок пагинации
      */
-    public function __construct(int $activePage, int $itemsNumberOnPage, int $itemsNumberTotal, int $buttonsNumber = self::DEFAULT_BUTTONS_NUMBER) 
+    public function __construct(int $activePage, int $itemsNumberOnPage, int $itemsNumberTotal, int $buttonsNumber = self::DEFAULT_BUTTONS_NUMBER)
     {
         // Задаём номер активной страницы документа
         $this->activePage = $itemsNumberTotal ? $activePage : 0;
@@ -51,7 +51,7 @@ class Pagination
         // Находим последнюю кнопку пагинации
         $this->lastButton = $itemsNumberTotal ? min($this->pagesNumber, $activePage + intdiv($buttonsNumber, 2)) : 0;
     }
-    
+
     /**
      * Возвращает номер первого элемента активной страницы документа
      * @param int $activePage - номер активной страницы
@@ -62,7 +62,7 @@ class Pagination
     {
         return ($activePage - 1) * $itemsNumberOnPage + 1;
     }
-    
+
     /**
      * Возвращает номер последнего элемента активной страницы документа
      * (Номер последнего элемента активной страницы может быть больше обшего числа элементов)
@@ -74,7 +74,7 @@ class Pagination
     {
         return $activePage * $itemsNumberOnPage;
     }
-    
+
     /**
      * Возвращает число элементов на активной странице
      * На последней странице число элементов может быть меньше $itemsNumberOnPage
@@ -84,7 +84,7 @@ class Pagination
     {
         return $this->itemsNumberTotal ? min($this->itemsNumberOnPage, $this->itemsNumberTotal - ($this->activePage - 1) * $this->itemsNumberOnPage) : 0;
     }
-    
+
     /**
      * Возвращает свойства класса Pagination, собранные в object
      * @return object

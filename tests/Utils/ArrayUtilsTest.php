@@ -63,9 +63,9 @@ class ArrayUtilsTest extends TestCase
                     'description' => 'zzzzz',
                     'items' => 't',
                     'foo' => 20
-                ] 
+                ]
         ];
-        
+
         $complexNoRepeats = [
             1 => (object)[
                     'name' => 'aaa',
@@ -76,7 +76,7 @@ class ArrayUtilsTest extends TestCase
                     'description' => 'zzzzz'
                 ],
         ];
-        
+
         $complexWithRepeats = [
             1 => (object)[
                     'name' => 'aaa',
@@ -89,7 +89,7 @@ class ArrayUtilsTest extends TestCase
                     'items' => ['s', 't']
                 ],
         ];
-        
+
         $complexWithRepeatsD2 = [
             1 => (object)[
                     'name' => 'aaa',
@@ -104,7 +104,7 @@ class ArrayUtilsTest extends TestCase
                     'foo' => [20, 20]
                 ],
         ];
-        
+
         $this->assertEquals($complexNoRepeats, ArrayUtils::flatToComplex($flatNoRepeats, 'id', ['name', 'description']));
         $this->assertEquals($complexWithRepeats, ArrayUtils::flatToComplex($flatWithRepeats, 'id', ['name', 'description'], ['items']));
         $this->assertEquals($complexWithRepeatsD2, ArrayUtils::flatToComplex($flatWithRepeatsD2, 'id', ['name', 'description'], ['items', 'foo']));

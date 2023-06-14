@@ -11,10 +11,12 @@
         "phpunit/phpunit": "^9.5"
     },
     "scripts": {
+        "fix": "php-cs-fixer fix .",
         "test": "phpunit"
     },
     "require": {
         "vlucas/phpdotenv": "^5.4",
-        "lcobucci/jwt": "^4.0"
+        "lcobucci/jwt": "^4.0",
+        "friendsofphp/php-cs-fixer": "^3.17"
     }
 }

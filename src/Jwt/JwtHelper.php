@@ -10,7 +10,6 @@ use Lcobucci\JWT\Token\Builder;
 use Lcobucci\JWT\Token\Parser;
 use Lcobucci\JWT\Token as TokenInterface;
 
-
 /**
  * Создаёт и проверяет токены
  * @property Builder $tokenBuilder
@@ -25,28 +24,27 @@ use Lcobucci\JWT\Token as TokenInterface;
  * @property ?\DateTimeImmutable $nbf Время, определяющее момент, когда токен станет валидным
  * @property ?\DateTimeImmutable $exp Время, определяющее момент, когда токен станет невалидным
  */
-class JwtHelper 
+class JwtHelper
 {
     private Builder $tokenBuilder;
     private Sha256 $algorithm;
     private InMemory $signingKey;
 
     private function __construct(
-            string $secretKey,
-            private string $iss,
-            private string $aud, 
-            private ?string $jti, 
-            private int $uid, 
-            private \DateTimeImmutable $iat, 
-            private ?\DateTimeImmutable $nbf = null,
-            private ?\DateTimeImmutable $exp = null
-    )
-    {
+        string $secretKey,
+        private string $iss,
+        private string $aud,
+        private ?string $jti,
+        private int $uid,
+        private \DateTimeImmutable $iat,
+        private ?\DateTimeImmutable $nbf = null,
+        private ?\DateTimeImmutable $exp = null
+    ) {
         $this->tokenBuilder = new Builder(new JoseEncoder(), ChainedFormatter::default());
         $this->algorithm = new Sha256();
         $this->signingKey = InMemory::base64Encoded($secretKey);
     }
-    
+
     /**
      * Генерация токена
      * @param string $secretKey
@@ -65,10 +63,10 @@ class JwtHelper
         $iat = new \DateTimeImmutable();
         $nbf = $nbfStep ? $iat->modify($nbfStep) : null;
         $exp = $expStep ? $iat->modify($expStep) : null;
-        
+
         return (new static($secretKey, $iss, $aud, $jti, $uid, $iat, $nbf, $exp))->getToken();
     }
-    
+
     /**
      * Извлечение токена из полученной стоки
      * @param string $strToken
@@ -78,7 +76,7 @@ class JwtHelper
     {
         return (new Parser(new JoseEncoder()))->parse($strToken);
     }
-    
+
     /**
      * Проверка действительности токена
      * @param TokenInterface $resultToken
@@ -89,20 +87,20 @@ class JwtHelper
     {
         // По параметрам полученного токена и секретному ключу создаём оригинальный токен
         $originalToken = (new static(
-                $secretKey,
-                $resultToken->claims()->get('iss'),
-                $resultToken->claims()->get('aud')[0],
-                $resultToken->claims()->get('jti'),
-                $resultToken->claims()->get('uid'),
-                $resultToken->claims()->get('iat'),
-                $resultToken->claims()->get('nbf'),
-                $resultToken->claims()->get('exp')
+            $secretKey,
+            $resultToken->claims()->get('iss'),
+            $resultToken->claims()->get('aud')[0],
+            $resultToken->claims()->get('jti'),
+            $resultToken->claims()->get('uid'),
+            $resultToken->claims()->get('iat'),
+            $resultToken->claims()->get('nbf'),
+            $resultToken->claims()->get('exp')
         ))->getToken();
-        
+
         // У полученного токена и оригинального токена должны совпадать подписи
         return $resultToken->signature()->toString() === $originalToken->signature()->toString();
     }
-    
+
     /**
      * Создание токена
      * @return TokenInterface
@@ -118,22 +116,22 @@ class JwtHelper
             ->issuedAt($this->iat)
             // Configures a new claim, called "uid"
             ->withClaim('uid', $this->uid);
-        
+
         // Configures the id (jti claim)
         if ($this->jti) {
             $this->tokenBuilder = $this->tokenBuilder->identifiedBy($this->jti);
         }
-        
+
         // Configures the time that the token can be used (nbf claim)
         if ($this->nbf) {
             $this->tokenBuilder = $this->tokenBuilder->canOnlyBeUsedAfter($this->nbf);
         }
-        
+
         // Configures the expiration time of the token (exp claim)
         if ($this->exp) {
             $this->tokenBuilder = $this->tokenBuilder->expiresAt($this->exp);
         }
-        
+
         // Builds a new token
         return $this->tokenBuilder->getToken($this->algorithm, $this->signingKey);
     }
