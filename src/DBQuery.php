@@ -4,7 +4,6 @@ namespace Base;
 
 /**
  * Класс для взаимодействия с базой данных
- * @property \PDO $dbh - соединение с базой
  */
 class DBQuery
 {
@@ -70,7 +69,7 @@ class DBQuery
      * Из базы данных извлекается одна строка в виде объекта
      * @param string $sql
      * @param array $param
-     * @return object|null
+     * @return object
      */
     public function selectObject(string $sql, array $param): object
     {

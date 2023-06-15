@@ -2,16 +2,14 @@
 
 namespace Base;
 
-/**
- * @property private array $routers
- * @property private object $error Содержит контроллер и экшен, которые используются, когда указан неверный путь и/или метод
- */
+use Base\Container\Container;
+
 class Router
 {
-    private array $routers = [];
+    protected array $routers = [];
 
     public function __construct(
-        private object $error
+        private Container $container
     ) {
     }
 
@@ -53,15 +51,15 @@ class Router
             // Если по всем частям $uri и патерна найдены совпадения, выполняем экшен
             if ($nCoincidence === count($arrPattern)) {
                 $isFind = true;
-                echo [new $router->controller(), $router->action](...$arrArg);
+                echo [new $router->controller($this->container->get('template')), $router->action](...$arrArg);
                 break;
             }
         }
 
         // Если полученног $uri нет в массиве маршрутов, то выполняем дефолтный экшен (задаётся в приложении)
         if (!$isFind) {
-            $errorController = $this->error->controller;
-            echo [new $errorController(), $this->error->action]();
+            $errorRouter = $this->container->get('error_router');
+            echo [new $errorRouter->controller(), $errorRouter->action]();
         }
     }
 

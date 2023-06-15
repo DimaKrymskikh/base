@@ -12,32 +12,32 @@ use Lcobucci\JWT\Token as TokenInterface;
 
 /**
  * Создаёт и проверяет токены
- * @property Builder $tokenBuilder
- * @property Sha256 $algorithm Используемый алгоритм при создании токена
- * @property InMemory $signingKey Особый формат хранения секретного ключа
- * @property string $secretKey Секретный ключ, должен быть в формате MIME base64
- * @property string $iss URI стороны, генерирующей токен
- * @property string $aud URI стороны, принимающей токен
- * @property ?string $jti Строка, определяющая уникальный идентификатор данного токена (по-моему, без $jti можно обойтись)
- * @property int $uid Индентификатор пользователя из базы данных
- * @property \DateTimeImmutable $iat Время, определяющее момент, когда токен был создан
- * @property ?\DateTimeImmutable $nbf Время, определяющее момент, когда токен станет валидным
- * @property ?\DateTimeImmutable $exp Время, определяющее момент, когда токен станет невалидным
  */
 class JwtHelper
 {
+    //
     private Builder $tokenBuilder;
+    // Используемый алгоритм при создании токена
     private Sha256 $algorithm;
+    // Особый формат хранения секретного ключа
     private InMemory $signingKey;
 
     private function __construct(
+        // Секретный ключ, должен быть в формате MIME base64
         string $secretKey,
+        // URI стороны, генерирующей токен
         private string $iss,
+        // URI стороны, принимающей токен
         private string $aud,
+        // Строка, определяющая уникальный идентификатор данного токена (по-моему, без $jti можно обойтись)
         private ?string $jti,
+        // Индентификатор пользователя из базы данных
         private int $uid,
+        // Время, определяющее момент, когда токен был создан
         private \DateTimeImmutable $iat,
+        // Время, определяющее момент, когда токен станет валидным
         private ?\DateTimeImmutable $nbf = null,
+        // Время, определяющее момент, когда токен станет невалидным
         private ?\DateTimeImmutable $exp = null
     ) {
         $this->tokenBuilder = new Builder(new JoseEncoder(), ChainedFormatter::default());

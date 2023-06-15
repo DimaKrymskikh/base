@@ -5,12 +5,6 @@ namespace Base;
 /**
  * Класс реализующий пагинацию
  * В пагинации должно быть нечётное число кнопок
- * @property int $activePage - номер активной страницы документа
- * @property int $itemsNumberOnPage - планируемое число элементов на странице
- * @property int $itemsNumberTotal - общее число элементов документа, к которому применяется пагинация
- * @property int $pagesNumber - число страниц документа
- * @property int $firstButton - первая кнопка пагинации
- * @property int $lastButton - последняя кнопка пагинации
  */
 class Pagination
 {
@@ -21,11 +15,17 @@ class Pagination
     // Дефолтное значение числа кнопок пагинации
     public const DEFAULT_BUTTONS_NUMBER = 5;
 
+    // Номер активной страницы документа
     private int $activePage;
+    // Планируемое число элементов на странице
     private int $itemsNumberOnPage;
+    // Общее число элементов документа, к которому применяется пагинация
     private int $itemsNumberTotal;
+    // Число страниц документа
     private int $pagesNumber;
+    // Первая кнопка пагинации
     private int $firstButton;
+    // Последняя кнопка пагинации
     private int $lastButton;
 
     /**

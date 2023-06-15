@@ -1,10 +1,11 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
+use Base\Container\Container;
 use Base\Router;
-use Tests\Controllers\FooController;
-use Tests\Controllers\BarController;
-use Tests\Controllers\ErrorController;
+use Tests\Sources\Controllers\FooController;
+use Tests\Sources\Controllers\BarController;
+use Tests\Sources\Controllers\ErrorController;
 
 class RouterTest extends TestCase
 {
@@ -12,10 +13,13 @@ class RouterTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->router = new Router((object) [
+        $container = new Container();
+        $container->register('error_router', fn () => (object)[
             'controller' => ErrorController::class,
             'action' => 'index'
         ]);
+
+        $this->router = new Router($container);
 
         $this->router->get('/', FooController::class, 'index');
         $this->router->get('foo', FooController::class, 'index');
