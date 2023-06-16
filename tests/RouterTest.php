@@ -14,9 +14,10 @@ class RouterTest extends TestCase
     protected function setUp(): void
     {
         $container = new Container();
-        $container->register('error_router', fn () => (object)[
+        $container->register('error_router', fn (): object => (object)[
             'controller' => ErrorController::class,
-            'action' => 'index'
+            'action' => 'index',
+            'template' => null
         ]);
 
         $this->router = new Router($container);

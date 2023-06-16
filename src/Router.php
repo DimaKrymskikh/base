@@ -59,7 +59,7 @@ class Router
         // Если полученног $uri нет в массиве маршрутов, то выполняем дефолтный экшен (задаётся в приложении)
         if (!$isFind) {
             $errorRouter = $this->container->get('error_router');
-            echo [new $errorRouter->controller(), $errorRouter->action]();
+            echo [new $errorRouter->controller($errorRouter->template), $errorRouter->action]();
         }
     }
 
