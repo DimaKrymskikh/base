@@ -19,15 +19,15 @@ class Router
      * @param string $uri
      * @return void
      */
-    public function run(string $method, string $uri): void
+    public function run(): void
     {
-        $arrUri = explode('/', trim($uri, '/'));
+        $arrUri = explode('/', trim($this->container->get('request')->uri, '/'));
         $isFind = false;
 
         // Перебираем все возможные маршруты до первого найденного
         foreach ($this->routers as $router) {
             // Методы запроса должны совпадать
-            if (mb_strtolower($method) !== mb_strtolower($router->method)) {
+            if (mb_strtolower($this->container->get('request')->method) !== mb_strtolower($router->method)) {
                 continue;
             }
             // Разбытые на части полученный $uri и паттерн должны иметь равное число частей

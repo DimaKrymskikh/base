@@ -2,10 +2,12 @@
 
 namespace Base\Container;
 
+use Base\Contracts\Container\Container as ContainerContract;
+
 /**
  * Класс для хранения глобальных зависимостей
  */
-final class Container
+final class Container implements ContainerContract
 {
     // Массив для хранения глобальных зависимостей
     private array $storage = [];

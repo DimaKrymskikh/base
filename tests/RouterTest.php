@@ -2,6 +2,8 @@
 
 use PHPUnit\Framework\TestCase;
 use Base\Container\Container;
+use Base\Registration\BaseRegistration;
+use Base\Registration\RequestRegistration;
 use Base\Router;
 use Tests\Sources\Controllers\FooController;
 use Tests\Sources\Controllers\BarController;
@@ -10,17 +12,24 @@ use Tests\Sources\Controllers\ErrorController;
 class RouterTest extends TestCase
 {
     private Router $router;
+    private Container $container;
 
     protected function setUp(): void
     {
-        $container = new Container();
-        $container->register('error_router', fn (): object => (object)[
-            'controller' => ErrorController::class,
-            'action' => 'index',
-            'template' => null
-        ]);
+        $this->container = new Container();
 
-        $this->router = new Router($container);
+        $config = (object) [
+            'app_url' => 'D:/app',
+            'template' => '/X/Y/main.php',
+            'views_uri' => '/X/',
+            'error_router' => (object) [
+                'controller' => ErrorController::class,
+            ],
+        ];
+
+        new BaseRegistration($this->container, $config);
+
+        $this->router = new Router($this->container);
 
         $this->router->get('/', FooController::class, 'index');
         $this->router->get('foo', FooController::class, 'index');
@@ -36,81 +45,159 @@ class RouterTest extends TestCase
         $this->router->delete('bar/{a}/{b}/str2/str3', BarController::class, 'delete');
     }
 
-    public function testSlash()
+    public function test_slash()
     {
+        $request = (object) [
+            'method' => 'get',
+            'uri' => '/'
+        ];
+        new RequestRegistration($this->container, $request);
+
         $this->expectOutputString('FooController->index');
-        $this->router->run('GET', '/');
+        $this->router->run();
     }
 
-    public function testFoo()
+    public function test_foo()
     {
+        $request = (object) [
+            'method' => 'get',
+            'uri' => '/foo'
+        ];
+        new RequestRegistration($this->container, $request);
+
         $this->expectOutputString('FooController->index');
-        $this->router->run('GET', 'foo');
+        $this->router->run();
     }
 
-    public function testGet()
+    public function test_get()
     {
+        $request = (object) [
+            'method' => 'get',
+            'uri' => '/foo/4'
+        ];
+        new RequestRegistration($this->container, $request);
+
         $this->expectOutputString('FooController->get: 4');
-        $this->router->run('get', 'foo/4');
+        $this->router->run();
     }
 
-    public function testPost()
+    public function test_post()
     {
+        $request = (object) [
+            'method' => 'POST',
+            'uri' => '/foo/4'
+        ];
+        new RequestRegistration($this->container, $request);
+
         $this->expectOutputString('FooController->post: 4');
-        $this->router->run('POST', 'foo/4');
+        $this->router->run();
     }
 
-    public function testPut()
+    public function test_put()
     {
+        $request = (object) [
+            'method' => 'put',
+            'uri' => 'foo/4/77'
+        ];
+        new RequestRegistration($this->container, $request);
+
         $this->expectOutputString('FooController->put: 4 и 77');
-        $this->router->run('PUT', 'foo/4/77');
+        $this->router->run();
     }
 
-    public function testDelete()
+    public function test_delete()
     {
+        $request = (object) [
+            'method' => 'DELETE',
+            'uri' => 'foo/4/str/abcd'
+        ];
+        new RequestRegistration($this->container, $request);
+
         $this->expectOutputString('FooController->delete: 4 и abcd');
-        $this->router->run('DELETE', 'foo/4/str/abcd');
+        $this->router->run();
     }
 
-    public function testBar()
+    public function test_bar()
     {
+        $request = (object) [
+            'method' => 'GET',
+            'uri' => 'bar'
+        ];
+        new RequestRegistration($this->container, $request);
+
         $this->expectOutputString('BarController->index');
-        $this->router->run('GET', 'bar');
+        $this->router->run();
     }
 
-    public function testBarGet()
+    public function test_bar_get()
     {
+        $request = (object) [
+            'method' => 'GET',
+            'uri' => '/bar/str/2'
+        ];
+        new RequestRegistration($this->container, $request);
+
         $this->expectOutputString('BarController->get: 2');
-        $this->router->run('GET', 'bar/str/2');
+        $this->router->run();
     }
 
-    public function testBarPost()
+    public function test_bar_post()
     {
+        $request = (object) [
+            'method' => 'post',
+            'uri' => '/bar/str/8/str2/aaaa/bbb/str3'
+        ];
+        new RequestRegistration($this->container, $request);
+
         $this->expectOutputString('BarController->post: 8, aaaa и bbb');
-        $this->router->run('post', 'bar/str/8/str2/aaaa/bbb/str3');
+        $this->router->run();
     }
 
-    public function testBarPut()
+    public function test_bar_put()
     {
+        $request = (object) [
+            'method' => 'pUt',
+            'uri' => '/bar/str/aa/str2/str3'
+        ];
+        new RequestRegistration($this->container, $request);
+
         $this->expectOutputString('BarController->put: aa');
-        $this->router->run('pUt', 'bar/str/aa/str2/str3');
+        $this->router->run();
     }
 
-    public function testBarDelete()
+    public function test_bar_delete()
     {
+        $request = (object) [
+            'method' => 'DelEte',
+            'uri' => 'bar/aaaaa/bbb/str2/str3'
+        ];
+        new RequestRegistration($this->container, $request);
+
         $this->expectOutputString('BarController->delete: aaaaa и bbb');
-        $this->router->run('DelEte', 'bar/aaaaa/bbb/str2/str3');
+        $this->router->run();
     }
 
-    public function testErrorUri()
+    public function test_non_existent_uri()
     {
+        $request = (object) [
+            'method' => 'get',
+            'uri' => 'baz'
+        ];
+        new RequestRegistration($this->container, $request);
+
         $this->expectOutputString('Страница не найдена');
-        $this->router->run('get', 'baz');
+        $this->router->run();
     }
 
-    public function testErrorMethod()
+    public function test_existent_uri_and_wrong_method()
     {
+        $request = (object) [
+            'method' => 'get',
+            'uri' => 'bar/str/aa/str2/str3'
+        ];
+        new RequestRegistration($this->container, $request);
+
         $this->expectOutputString('Страница не найдена');
-        $this->router->run('get', 'bar/str/aa/str2/str3');
+        $this->router->run();
     }
 }
