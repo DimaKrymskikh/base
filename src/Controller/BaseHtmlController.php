@@ -2,16 +2,22 @@
 
 namespace Base\Controller;
 
+use Base\Container\Container;
+
 class BaseHtmlController extends HtmlController
 {
     // Заголовок html-страницы (для тега <title>)
     protected string $title = '';
     // Шаблон html-страницы
     private string $template;
+    // Папка, в которой находятся представления
+    private string $viewsFolder;
 
-    public function __construct($template = null)
-    {
-        $this->template = $template;
+    public function __construct(
+        private Container $container
+    ) {
+        $this->template = $this->container->get('is_find_route') ? $this->container->get('module')->template : $this->container->get('error_router')->template;
+        $this->viewsFolder = $this->container->get('is_find_route') ? $this->container->get('module')->views_folder : $this->container->get('error_router')->views_folder;
     }
 
     /**
@@ -22,7 +28,7 @@ class BaseHtmlController extends HtmlController
      */
     protected function render(string $file, array $params = []): string
     {
-        $content = $this->renderContent(static::BASE_URL . $file, $params);
+        $content = $this->renderContent($this->viewsFolder . $file, $params);
         return $this->renderContent($this->template, [
                 'content' => $content,
                 'title' => $this->title
@@ -39,7 +45,8 @@ class BaseHtmlController extends HtmlController
     {
         ob_start();
         extract($params, EXTR_OVERWRITE);
-        require_once $file;
+        // Из-за тестов используется require, а не require_once
+        require $file;
         return ob_get_clean();
     }
 }

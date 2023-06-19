@@ -7,11 +7,11 @@ use Base\Contracts\Registration\Registration;
 
 class RequestRegistration extends Registration
 {
-    protected function register(Container $container, object $config): void
+    protected function register(Container $container, object $request): void
     {
         $container->register('request', fn (): object => (object) [
-            'method' => $config->method,
-            'uri' => $config->uri
+            'method' => $request->method,
+            'uri' => $request->uri
         ]);
     }
 }

@@ -18,17 +18,17 @@ class ModuleRegistrationTest extends TestCase
         $this->config = (object) [
             'app_url' => 'D:/app',
             'template' => 'D:/X/Y/main.php',
-            'views_uri' => 'D:/X/'
+            'views_folder' => 'D:/X/'
         ];
 
         $this->modules = [
             'ma' => (object) [
                 'pattern' => 'm/a',
-                'views_uri' => 'D:/app/a/Views/',
+                'views_folder' => 'D:/app/a/Views/',
             ],
             'mb' => (object) [
                 'pattern' => 'm/b',
-                'views_uri' => 'D:/app/b/Views/',
+                'views_folder' => 'D:/app/b/Views/',
                 'template' => 'D:/app/b/main.php'
             ],
             'mc' => (object) [
@@ -43,8 +43,8 @@ class ModuleRegistrationTest extends TestCase
     {
         new ModuleRegistration($this->container, $this->config);
 
-        $this->assertEquals('D:/X/Y/main.php', $this->container->get('modul')->template);
-        $this->assertEquals('D:/X/', $this->container->get('modul')->views_uri);
+        $this->assertEquals('D:/X/Y/main.php', $this->container->get('module')->template);
+        $this->assertEquals('D:/X/', $this->container->get('module')->views_folder);
     }
 
     public function test_registration_can_with_module_a(): void
@@ -58,8 +58,8 @@ class ModuleRegistrationTest extends TestCase
         new RequestRegistration($this->container, $request);
         new ModuleRegistration($this->container, $this->config);
 
-        $this->assertEquals('D:/X/Y/main.php', $this->container->get('modul')->template);
-        $this->assertEquals('D:/app/a/Views/', $this->container->get('modul')->views_uri);
+        $this->assertEquals('D:/X/Y/main.php', $this->container->get('module')->template);
+        $this->assertEquals('D:/app/a/Views/', $this->container->get('module')->views_folder);
     }
 
     public function test_registration_can_with_module_b(): void
@@ -73,8 +73,8 @@ class ModuleRegistrationTest extends TestCase
         new RequestRegistration($this->container, $request);
         new ModuleRegistration($this->container, $this->config);
 
-        $this->assertEquals('D:/app/b/main.php', $this->container->get('modul')->template);
-        $this->assertEquals('D:/app/b/Views/', $this->container->get('modul')->views_uri);
+        $this->assertEquals('D:/app/b/main.php', $this->container->get('module')->template);
+        $this->assertEquals('D:/app/b/Views/', $this->container->get('module')->views_folder);
     }
 
     public function test_registration_can_with_module_c(): void
@@ -88,7 +88,7 @@ class ModuleRegistrationTest extends TestCase
         new RequestRegistration($this->container, $request);
         new ModuleRegistration($this->container, $this->config);
 
-        $this->assertEquals('D:/X/Y/main.php', $this->container->get('modul')->template);
-        $this->assertEquals('D:/X/', $this->container->get('modul')->views_uri);
+        $this->assertEquals('D:/X/Y/main.php', $this->container->get('module')->template);
+        $this->assertEquals('D:/X/', $this->container->get('module')->views_folder);
     }
 }

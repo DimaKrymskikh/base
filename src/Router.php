@@ -22,7 +22,7 @@ class Router
     public function run(): void
     {
         $arrUri = explode('/', trim($this->container->get('request')->uri, '/'));
-        $isFind = false;
+        $this->container->register('is_find_route', fn (): bool => false);
 
         // Перебираем все возможные маршруты до первого найденного
         foreach ($this->routers as $router) {
@@ -48,18 +48,19 @@ class Router
                     $nCoincidence++;
                 }
             }
-            // Если по всем частям $uri и патерна найдены совпадения, выполняем экшен
+            // Если по всем частям $uri и паттерна найдены совпадения, регистрируем, что маршрут найден
             if ($nCoincidence === count($arrPattern)) {
-                $isFind = true;
-                echo [new $router->controller($this->container->get('template')), $router->action](...$arrArg);
+                $this->container->register('is_find_route', fn (): bool => true);
+                $this->container->register('router_action', fn (): string => $router->action);
                 break;
             }
         }
 
-        // Если полученног $uri нет в массиве маршрутов, то выполняем дефолтный экшен (задаётся в приложении)
-        if (!$isFind) {
-            $errorRouter = $this->container->get('error_router');
-            echo [new $errorRouter->controller($errorRouter->template), $errorRouter->action]();
+        if($this->container->get('is_find_route')) {
+            echo [new $router->controller($this->container), $this->container->get('router_action')](...$arrArg);
+        } else {
+            $controller = $this->container->get('error_router')->controller;
+            echo [new $controller($this->container), $this->container->get('error_router')->action]();
         }
     }
 

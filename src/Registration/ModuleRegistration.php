@@ -24,14 +24,14 @@ final class ModuleRegistration extends Registration
 
         // Если в модуле не определено какое-то поле, берём главное поле конфигурации
         if($givenModul) {
-            $container->register('modul', fn (): object => (object) [
-                'views_uri' => isset($givenModul->views_uri) ? $givenModul->views_uri : $container->get('views_uri'),
+            $container->register('module', fn (): object => (object) [
+                'views_folder' => isset($givenModul->views_folder) ? $givenModul->views_folder : $container->get('views_folder'),
                 'template' => isset($givenModul->template) ? $givenModul->template : $container->get('template'),
             ]);
             // Если uri запроса не содержит pattern какого-либо модуля, берём главные поля конфигурации
         } else {
-            $container->register('modul', fn (): object => (object) [
-                'views_uri' => $container->get('views_uri'),
+            $container->register('module', fn (): object => (object) [
+                'views_folder' => $container->get('views_folder'),
                 'template' => $container->get('template'),
             ]);
         }

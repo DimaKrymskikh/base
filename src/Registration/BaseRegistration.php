@@ -2,6 +2,7 @@
 
 namespace Base\Registration;
 
+use Base\Contracts\Constants\DefaultConfig;
 use Base\Container\Container;
 use Base\Contracts\Registration\Registration;
 
@@ -18,20 +19,22 @@ class BaseRegistration extends Registration
 
         // Остальные главные поля конфигурации регистрируем по определению в конфигурации,
         // а если в конфигурации поле отсутствует, то задаём значение по-умолчанию
-        $container->register('template', fn (): string => isset($config->template) ? $config->template : $container->get('app_url') . '/Views/template.php');
-        $container->register('views_uri', fn (): string => isset($config->views_uri) ? $config->views_uri : $container->get('app_url') . '/Views/');
+        $container->register('template', fn (): string => isset($config->template) ? $config->template : $container->get('app_url') . DefaultConfig::Template->value);
+        $container->register('views_folder', fn (): string => isset($config->views_folder) ? $config->views_folder : $container->get('app_url') . DefaultConfig::ViewsFolder->value);
         $container->register(
             'error_router',
             fn (): object => isset($config->error_router)
             ? (object) [
-                    'controller' => isset($config->error_router->controller) ? $config->error_router->controller : 'App\Controllers\ErrorController',
-                    'action' => isset($config->error_router->action) ? $config->error_router->action : 'index',
-                    'template' => isset($config->error_router->template) ? $config->error_router->template : $container->get('app_url') . '/Views/errorTemplate.php'
+                    'controller' => isset($config->error_router->controller) ? $config->error_router->controller : DefaultConfig::ErrorController->value,
+                    'action' => isset($config->error_router->action) ? $config->error_router->action : DefaultConfig::ErrorAction->value,
+                    'template' => isset($config->error_router->template) ? $config->error_router->template : $container->get('app_url') . DefaultConfig::ErrorTemplate->value,
+                    'views_folder' => isset($config->error_router->views_folder) ? $config->error_router->views_folder : $container->get('app_url') . DefaultConfig::ViewsFolder->value,
                 ]
             : (object) [
-                    'controller' => 'App\Controllers\ErrorController',
-                    'action' => 'index',
-                    'template' => $container->get('app_url') . '/Views/errorTemplate.php'
+                    'controller' => DefaultConfig::ErrorController->value,
+                    'action' => DefaultConfig::ErrorAction->value,
+                    'template' => $container->get('app_url') . DefaultConfig::ErrorTemplate->value,
+                    'views_folder' => $container->get('app_url') . DefaultConfig::ViewsFolder->value,
                 ]
         );
     }

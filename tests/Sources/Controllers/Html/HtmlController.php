@@ -1,13 +1,11 @@
 <?php
 
-namespace Tests\Sources\Controllers;
+namespace Tests\Sources\Controllers\Html;
 
 use Base\Controller\BaseHtmlController;
 
 class HtmlController extends BaseHtmlController
 {
-    protected const BASE_URL = __DIR__ . '/../Views/';
-
     public function action(): string
     {
         return $this->render('test.php', [
