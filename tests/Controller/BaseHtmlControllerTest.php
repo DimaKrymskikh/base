@@ -37,7 +37,7 @@ class BaseHtmlControllerTest extends TestCase
         $this->container->register('is_find_route', fn (): bool => true);
         $str = (new HtmlController($this->container))->action();
 
-        $this->assertEquals('begin a=5 b=x end', $str);
+        $this->assertEquals('begin value a=5 b=x end', $str);
     }
 
     public function test_error_controller(): void

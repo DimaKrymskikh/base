@@ -8,6 +8,8 @@ class BaseHtmlController extends HtmlController
 {
     // Заголовок html-страницы (для тега <title>)
     protected string $title = '';
+    // Массив переменных для шаблона
+    private array $templateParameters = [];
     // Шаблон html-страницы
     private string $template;
     // Папка, в которой находятся представления
@@ -29,10 +31,10 @@ class BaseHtmlController extends HtmlController
     protected function render(string $file, array $params = []): string
     {
         $content = $this->renderContent($this->viewsFolder . $file, $params);
-        return $this->renderContent($this->template, [
+        return $this->renderContent($this->template, array_merge($this->templateParameters, [
                 'content' => $content,
                 'title' => $this->title
-            ]);
+            ]));
     }
 
     /**
@@ -48,5 +50,21 @@ class BaseHtmlController extends HtmlController
         // Из-за тестов используется require, а не require_once
         require $file;
         return ob_get_clean();
+    }
+
+    /**
+     * При ajax-запросе будет отрисован только контент, при http-запросе вся страница документа
+     * @param string $file - файл с контентом
+     * @param array $data - передаваемые в $file переменные
+     * @return string - вся страница документа или только блок контента на странице документа
+     */
+    protected function conditionalRender(string $file, array $data): string
+    {
+        return filter_input(INPUT_SERVER, 'HTTP_X_REQUESTED_WITH') ? $this->renderContent($this->viewsFolder . $file, $data) : $this->render($file, $data);
+    }
+
+    protected function pushTemplateParameters(string $key, string $value): void
+    {
+        $this->templateParameters[$key] = $value;
     }
 }

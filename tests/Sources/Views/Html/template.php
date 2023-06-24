@@ -1,1 +1,1 @@
-begin <?= $content ?> end
+begin <?= $key ?> <?= $content ?> end
