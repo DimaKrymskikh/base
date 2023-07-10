@@ -26,6 +26,9 @@ class BaseRegistrationTest extends TestCase
 
         $this->assertEquals('D:/app/Views/template.php', $container->get('template'));
         $this->assertEquals('D:/app/Views/', $container->get('views_folder'));
+        $this->assertEquals('D:/app/../public/index.html', $container->get('spa_index'));
+        $this->assertEmpty($container->get('db'));
+        $this->assertEmpty($container->get('env'));
     }
 
     public function test_registration_can_if_app_url_set(): void
@@ -34,12 +37,21 @@ class BaseRegistrationTest extends TestCase
         $config = (object) [
             'app_url' => 'D:/app',
             'template' => '/X/Y/main.php',
-            'views_folder' => '/X/'
+            'views_folder' => '/X/',
+            'env' => (object)[
+                'token' => 'aaa',
+                'domain' => 'bbb',
+            ]
         ];
 
         new BaseRegistration($container, $config);
 
         $this->assertEquals('/X/Y/main.php', $container->get('template'));
         $this->assertEquals('/X/', $container->get('views_folder'));
+        $this->assertEmpty($container->get('db'));
+        $this->assertEquals((object)[
+                'token' => 'aaa',
+                'domain' => 'bbb',
+            ], $container->get('env'));
     }
 }

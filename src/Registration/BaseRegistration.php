@@ -37,5 +37,16 @@ class BaseRegistration extends Registration
                     'views_folder' => $container->get('app_url') . DefaultConfig::ViewsFolder->value,
                 ]
         );
+        $container->register('spa_index', fn (): string => isset($config->spa_index) ? $config->spa_index : $container->get('app_url') . DefaultConfig::SpaIndex->value);
+
+        // Если в приложении имеются переменные окружения, регистрируем переменные окружения
+        if(isset($config->env)) {
+            $container->register('env', fn (): object => $config->env);
+        }
+
+        // Если в приложении имеются параметры базы данных, регистрируем параметры базы данных
+        if(isset($config->db)) {
+            $container->register('db', fn (): object => $config->db);
+        }
     }
 }

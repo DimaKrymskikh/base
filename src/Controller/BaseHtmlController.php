@@ -16,7 +16,7 @@ class BaseHtmlController extends HtmlController
     private string $viewsFolder;
 
     public function __construct(
-        private Container $container
+        protected Container $container
     ) {
         $this->template = $this->container->get('is_find_route') ? $this->container->get('module')->template : $this->container->get('error_router')->template;
         $this->viewsFolder = $this->container->get('is_find_route') ? $this->container->get('module')->views_folder : $this->container->get('error_router')->views_folder;
@@ -63,6 +63,12 @@ class BaseHtmlController extends HtmlController
         return filter_input(INPUT_SERVER, 'HTTP_X_REQUESTED_WITH') ? $this->renderContent($this->viewsFolder . $file, $data) : $this->render($file, $data);
     }
 
+    /**
+     * Добавляет параметры в шаблон
+     * @param string $key
+     * @param string $value
+     * @return void
+     */
     protected function pushTemplateParameters(string $key, string $value): void
     {
         $this->templateParameters[$key] = $value;
