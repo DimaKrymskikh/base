@@ -26,7 +26,6 @@ class BaseRegistrationTest extends TestCase
 
         $this->assertEquals('D:/app/Views/template.php', $container->get('template'));
         $this->assertEquals('D:/app/Views/', $container->get('views_folder'));
-        $this->assertEquals('D:/app/../public/index.html', $container->get('spa_index'));
         $this->assertEmpty($container->get('db'));
         $this->assertEmpty($container->get('env'));
     }

@@ -10,7 +10,6 @@ enum DefaultConfig: string
 {
     case Template = '/Views/template.php';
     case ViewsFolder = '/Views/';
-    case SpaIndex = '/../public/index.html';
     case ErrorController = 'App\Controllers\ErrorController';
     case ErrorAction = 'index';
     case ErrorTemplate = '/Views/errorTemplate.php';
