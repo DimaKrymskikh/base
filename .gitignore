@@ -3,6 +3,3 @@
 
 # Это генерирует Composer
 /vendor/
-
-.env
-.php-cs-fixer.cache
