@@ -8,10 +8,11 @@ class BaseRegistrationTest extends TestCase
 {
     public function test_registration_can_not_if_app_url_not_set(): void
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('В конфигурации не задан url приложения');
+        
         $container = new Container();
         $config = (object) [];
-
-        $this->expectErrorMessage('В конфигурации не задан url приложения');
         new BaseRegistration($container, $config);
     }
 
