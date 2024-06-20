@@ -4,6 +4,7 @@ namespace Base\Foundation;
 
 use Base\Support\DB\DB;
 use Base\Support\DB\DBconnection;
+use Base\Support\Options;
 use Base\Support\Request;
 
 class Application
