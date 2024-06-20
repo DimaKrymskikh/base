@@ -3,13 +3,12 @@
 namespace Tests\Sources\Controllers\Html;
 
 use Base\Controller\BaseHtmlController;
-use Base\Container\Container;
 
 class HtmlController extends BaseHtmlController
 {
-    public function __construct(Container $container)
+    public function __construct(array $storage)
     {
-        parent::__construct($container);
+        parent::__construct($storage);
         $this->pushTemplateParameters('key', 'value');
     }
 

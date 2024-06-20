@@ -1,67 +1,65 @@
 <?php
 
-namespace Base;
+namespace Base\Support;
 
-use Base\Container\Container;
-
-class Router
+final class Router
 {
-    protected array $routers = [];
+    private array $routers = [];
 
     public function __construct(
-        private Container $container
-    ) {
-    }
+        private array $storage
+    )
+    {}
 
     /**
-     * По полученному методу и $uri выполняется соответствующий экшен
-     * @param string $method
-     * @param string $uri
-     * @return void
+     * По полученному методу и $uri возвращается контроллер, экшен и его параметры
+     * 
+     * @return object
      */
-    public function run(): void
+    public function getAction(): object
     {
-        $arrUri = explode('/', trim($this->container->get('request')->uri, '/'));
-        $this->container->register('is_find_route', fn (): bool => false);
-
+        $requestUri = explode('/', trim($this->storage['request']->uri, '/'));
+        
         // Перебираем все возможные маршруты до первого найденного
         foreach ($this->routers as $router) {
             // Методы запроса должны совпадать
-            if (mb_strtolower($this->container->get('request')->method) !== mb_strtolower($router->method)) {
+            if (mb_strtolower($this->storage['request']->method) !== mb_strtolower($router->method)) {
                 continue;
             }
-            // Разбытые на части полученный $uri и паттерн должны иметь равное число частей
-            $arrPattern = explode('/', trim($router->pattern, '/'));
-            if (count($arrUri) !== count($arrPattern)) {
+            // Разбитые на части полученный $uri и паттерн должны иметь равное число частей
+            $patternUri = explode('/', trim($router->pattern, '/'));
+            if (count($requestUri) !== count($patternUri)) {
                 continue;
             }
-            // Сравнивая части $uri и патернам, находим аргументы экшена
+            // Сравнивая части $uri и паттерна, находим аргументы экшена
             $arrArg = [];
             $nCoincidence = 0;
-            foreach ($arrPattern as $key => $part) {
+            foreach ($patternUri as $key => $part) {
                 // Если часть паттерна заключена в фигурные скобки, то соответствующая часть $uri - аргумент экшена
                 if (str_starts_with($part, '{') && str_ends_with($part, '}')) {
-                    $arrArg[] = $arrUri[$key];
+                    $arrArg[] = $requestUri[$key];
                     $nCoincidence++;
                     // Если часть паттерна без фигурных скобок, то она должна равняться соответствующей части $uri
-                } elseif ($arrPattern[$key] === $arrUri[$key]) {
+                } elseif ($patternUri[$key] === $requestUri[$key]) {
                     $nCoincidence++;
                 }
             }
-            // Если по всем частям $uri и паттерна найдены совпадения, регистрируем, что маршрут найден
-            if ($nCoincidence === count($arrPattern)) {
-                $this->container->register('is_find_route', fn (): bool => true);
-                $this->container->register('router_action', fn (): string => $router->action);
-                break;
+            // Если по всем частям $uri и паттерна найдены совпадения, то возвращается контроллер, экшен и параметры экшена
+            if ($nCoincidence === count($patternUri)) {
+                return (object) [
+                    'controller' => $router->controller,
+                    'action' => $router->action,
+                    'arr_arg' => $arrArg
+                ];
             }
         }
-
-        if($this->container->get('is_find_route')) {
-            echo [new $router->controller($this->container), $this->container->get('router_action')](...$arrArg);
-        } else {
-            $controller = $this->container->get('error_router')->controller;
-            echo [new $controller($this->container), $this->container->get('error_router')->action]();
-        }
+        
+        // Если по всем частям $uri и паттерна не найдены совпадения, то возвращается error-контроллер, экшен с параметром 'Страница не найдена'
+        return (object) [
+            'controller' => $this->storage['config']->error_router->controller,
+            'action' => $this->storage['config']->error_router->action,
+            'arr_arg' => ['Страница не найдена']
+        ];
     }
 
     /**

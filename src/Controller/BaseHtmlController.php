@@ -2,24 +2,25 @@
 
 namespace Base\Controller;
 
-use Base\Container\Container;
-
 class BaseHtmlController extends HtmlController
 {
     // Заголовок html-страницы (для тега <title>)
     protected string $title = '';
     // Массив переменных для шаблона
     private array $templateParameters = [];
+    // url приложения
+    private string $appUri;
     // Шаблон html-страницы
     private string $template;
     // Папка, в которой находятся представления
     private string $viewsFolder;
 
     public function __construct(
-        protected Container $container
+        protected array $storage
     ) {
-        $this->template = $this->container->get('is_find_route') ? $this->container->get('module')->template : $this->container->get('error_router')->template;
-        $this->viewsFolder = $this->container->get('is_find_route') ? $this->container->get('module')->views_folder : $this->container->get('error_router')->views_folder;
+        $this->appUri = $this->storage['config']->app_url;
+        $this->template = $this->getTemplate();
+        $this->viewsFolder = $this->getViewsFolder();
     }
 
     /**
@@ -30,7 +31,7 @@ class BaseHtmlController extends HtmlController
      */
     protected function render(string $file, array $params = []): string
     {
-        $content = $this->renderContent($this->viewsFolder . $file, $params);
+        $content = $this->renderContent($this->viewsFolder.$file, $params);
         return $this->renderContent($this->template, array_merge($this->templateParameters, [
                 'content' => $content,
                 'title' => $this->title
@@ -60,7 +61,7 @@ class BaseHtmlController extends HtmlController
      */
     protected function conditionalRender(string $file, array $data): string
     {
-        return filter_input(INPUT_SERVER, 'HTTP_X_REQUESTED_WITH') ? $this->renderContent($this->viewsFolder . $file, $data) : $this->render($file, $data);
+        return filter_input(INPUT_SERVER, 'HTTP_X_REQUESTED_WITH') ? $this->renderContent($this->viewsFolder.$file, $data) : $this->render($file, $data);
     }
 
     /**
@@ -72,5 +73,15 @@ class BaseHtmlController extends HtmlController
     protected function pushTemplateParameters(string $key, string $value): void
     {
         $this->templateParameters[$key] = $value;
+    }
+    
+    private function getTemplate(): string
+    {
+        return $this->appUri.$this->storage['request']->module->template;
+    }
+    
+    private function getViewsFolder(): string
+    {
+        return $this->appUri.$this->storage['request']->module->views_folder;
     }
 }
