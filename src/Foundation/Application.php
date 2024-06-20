@@ -23,7 +23,7 @@ class Application
         $this->dbConnection = new DBconnection($config->db);
         
         // Если в конфигурации приложения не заданы некоторые параметры, берём дефолтные
-        $this->config = (new Options($this->config))->config;
+        $this->config = (new Options($config))->config;
         
         // Определяем настройки, соответствующие запросу
         $method = filter_input(INPUT_SERVER, 'REQUEST_METHOD');
