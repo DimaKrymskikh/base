@@ -2,6 +2,7 @@
 
 use Base\DataTransferObjects\InputServerDto;
 use Base\Foundation\Application;
+use Base\Support\DB\DB;
 use Base\Support\DB\DBconnection;
 
 /**
