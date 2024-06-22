@@ -60,7 +60,7 @@ class OptionsTest extends TestCase
                 'controller' => 'App\Controllers\ErrorController',
                 'action' => 'action',
                 'template' => '/Views/errorTemplate.php',
-                'views_folder' => '/Http/Views/'
+                'views_folder' => '/Http/Views/error/'
             ],
             'modules' => [
                 'module_one' => (object) [

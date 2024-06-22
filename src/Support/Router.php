@@ -2,28 +2,32 @@
 
 namespace Base\Support;
 
+use Base\Foundation\Application;
+
 final class Router
 {
     private array $routers = [];
 
     public function __construct(
-        private array $storage
+        private Application $app
     )
     {}
 
     /**
-     * По полученному методу и $uri возвращается контроллер, экшен и его параметры
+     * Добавляет в контейнер приложения контроллер и данные, необходимые этому контроллеру
      * 
-     * @return object
+     * @return void
      */
-    public function getAction(): object
+    public function setAction(): void
     {
-        $requestUri = explode('/', trim($this->storage['request']->uri, '/'));
+        $appUri = $this->app->make('config')->app_url;
+        
+        $requestUri = explode('/', trim($this->app->make('request')->uri, '/'));
         
         // Перебираем все возможные маршруты до первого найденного
         foreach ($this->routers as $router) {
             // Методы запроса должны совпадать
-            if (mb_strtolower($this->storage['request']->method) !== mb_strtolower($router->method)) {
+            if (mb_strtolower($this->app->make('request')->method) !== mb_strtolower($router->method)) {
                 continue;
             }
             // Разбитые на части полученный $uri и паттерн должны иметь равное число частей
@@ -44,22 +48,29 @@ final class Router
                     $nCoincidence++;
                 }
             }
-            // Если по всем частям $uri и паттерна найдены совпадения, то возвращается контроллер, экшен и параметры экшена
+            // Если по всем частям $uri и паттерна найдены совпадения, то добавляем в контейнер контроллер маршрута
+            // и данные, необходимые этому контроллеру
             if ($nCoincidence === count($patternUri)) {
-                return (object) [
-                    'controller' => $router->controller,
-                    'action' => $router->action,
-                    'arr_arg' => $arrArg
-                ];
+                $this->app->bind('action', fn (): object => (object) [
+                        'controller' => $router->controller,
+                        'action' => $router->action,
+                        'arr_arg' => $arrArg,
+                        'template' => $appUri.$this->app->make('request')->module->template,
+                        'views_folder' => $appUri.$this->app->make('request')->module->views_folder,
+                    ]);
+                return;
             }
         }
         
-        // Если по всем частям $uri и паттерна не найдены совпадения, то возвращается error-контроллер, экшен с параметром 'Страница не найдена'
-        return (object) [
-            'controller' => $this->storage['config']->error_router->controller,
-            'action' => $this->storage['config']->error_router->action,
-            'arr_arg' => ['Страница не найдена']
-        ];
+        // Если по всем частям $uri и паттерна не найдены совпадения, то добавляем в контейнер контроллер для ошибок
+        // и данные, необходимые этому контроллеру
+        $this->app->bind('action', fn (): object => (object) [
+                'controller' => $this->app->make('config')->error_router->controller,
+                'action' => $this->app->make('config')->error_router->action,
+                'arr_arg' => ['Страница не найдена'],
+                'template' => $appUri.$this->app->make('config')->error_router->template,
+                'views_folder' => $appUri.$this->app->make('config')->error_router->views_folder,
+            ]);
     }
 
     /**

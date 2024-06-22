@@ -2,46 +2,48 @@
 
 namespace Base\Foundation;
 
+use Base\DataTransferObjects\InputServerDto;
 use Base\Support\DB\DB;
-use Base\Support\DB\DBconnection;
 use Base\Support\Options;
 use Base\Support\Request;
 
-class Application
+final class Application
 {
-    private DBconnection $dbConnection;
-    private object $config;
-    private object $request;
+    // Контейнер приложения
+    private array $storage = [];
 
-
-    public function __construct(object $config)
+    public function __construct(DB $db, object $config, InputServerDto $inputServer)
     {
-        // В конфигурации приложения обязательно должены быть заданы настройки базы данных
-        if(!isset($config->db)) {
-            throw new \Exception('В конфигурации не заданы настройки базы данных');
-        }
-        $this->dbConnection = new DBconnection($config->db);
+        $this->bind('db', fn (): DB => $db);
         
         // Если в конфигурации приложения не заданы некоторые параметры, берём дефолтные
-        $this->config = (new Options($config))->config;
+        $finishedConfig = (new Options($config))->config;
+        $this->bind('config', fn (): object => $finishedConfig);
         
         // Определяем настройки, соответствующие запросу
-        $method = filter_input(INPUT_SERVER, 'REQUEST_METHOD');
-        $uri = trim(parse_url(filter_input(INPUT_SERVER, 'REQUEST_URI'), PHP_URL_PATH), '/');
-        $this->request = (new Request($this->config, $method, $uri))->request;
+        $this->bind('request', fn (): object => (new Request($finishedConfig, $inputServer))->request);
     }
     
     /**
-     * Возвращает окончательный массив настоек для приложения
+     * Добавляет объект в контейнер приложения
      * 
-     * @return array
+     * @param string $key - ключ объекта в контейнере
+     * @param \Closure $callback - замыкание, которое должно возвращать объект
+     * @return void
      */
-    public function getStorage(): array
+    public function bind(string $key, \Closure $callback): void
     {
-        return [
-            'db' => new DB($this->dbConnection),
-            'config' => $this->config,
-            'request' => $this->request
-        ];
+        $this->storage[$key] = $callback();
+    }
+    
+    /**
+     * Извлекает из контейнера приложения объект с ключом $key
+     * 
+     * @param string $key
+     * @return mixed
+     */
+    public function make(string $key): mixed
+    {
+        return isset($this->storage[$key]) ? $this->storage[$key] : null;
     }
 }

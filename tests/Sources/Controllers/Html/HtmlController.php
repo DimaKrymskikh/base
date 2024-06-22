@@ -6,10 +6,10 @@ use Base\Controller\BaseHtmlController;
 
 class HtmlController extends BaseHtmlController
 {
-    public function __construct(array $storage)
+    public function __construct(object $action)
     {
-        parent::__construct($storage);
-        $this->pushTemplateParameters('key', 'value');
+        parent::__construct($action);
+        $this->templateParameters['key'] = 'value';
     }
 
     public function action(): string

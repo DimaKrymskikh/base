@@ -7,20 +7,17 @@ class BaseHtmlController extends HtmlController
     // Заголовок html-страницы (для тега <title>)
     protected string $title = '';
     // Массив переменных для шаблона
-    private array $templateParameters = [];
-    // url приложения
-    private string $appUri;
+    protected array $templateParameters = [];
     // Шаблон html-страницы
-    private string $template;
+    protected string $template;
     // Папка, в которой находятся представления
-    private string $viewsFolder;
+    protected string $viewsFolder;
 
     public function __construct(
-        protected array $storage
+        protected object $action
     ) {
-        $this->appUri = $this->storage['config']->app_url;
-        $this->template = $this->getTemplate();
-        $this->viewsFolder = $this->getViewsFolder();
+        $this->template = $action->template;
+        $this->viewsFolder = $action->views_folder;
     }
 
     /**
@@ -62,26 +59,5 @@ class BaseHtmlController extends HtmlController
     protected function conditionalRender(string $file, array $data): string
     {
         return filter_input(INPUT_SERVER, 'HTTP_X_REQUESTED_WITH') ? $this->renderContent($this->viewsFolder.$file, $data) : $this->render($file, $data);
-    }
-
-    /**
-     * Добавляет параметры в шаблон
-     * @param string $key
-     * @param string $value
-     * @return void
-     */
-    protected function pushTemplateParameters(string $key, string $value): void
-    {
-        $this->templateParameters[$key] = $value;
-    }
-    
-    private function getTemplate(): string
-    {
-        return $this->appUri.$this->storage['request']->module->template;
-    }
-    
-    private function getViewsFolder(): string
-    {
-        return $this->appUri.$this->storage['request']->module->views_folder;
     }
 }

@@ -34,7 +34,7 @@ class Config
             'app_url' => 'test',
             'views_folder' => '/Http/Views/',
             'error_router' => (object) [
-                'views_folder' => '/Http/Views/',
+                'views_folder' => '/Http/Views/error/',
                 'action' => 'action',
             ],
             'modules' => [

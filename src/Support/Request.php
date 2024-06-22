@@ -2,16 +2,18 @@
 
 namespace Base\Support;
 
+use Base\DataTransferObjects\InputServerDto;
+
 readonly class Request
 {
     public object $request;
     
-    public function __construct(object $config, string $method, string $uri)
+    public function __construct(object $config, InputServerDto $inputServer)
     {
         $this->request = (object) [
-            'method' => $method,
-            'uri' => $uri,
-            'module' => (new ModuleRegistration($config, $uri))->getRequestModule()
+            'method' => $inputServer->method,
+            'uri' => $inputServer->uri,
+            'module' => (new ModuleRegistration($config, $inputServer->uri))->getRequestModule()
         ];
     }
 }
