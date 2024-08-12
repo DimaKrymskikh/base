@@ -2,6 +2,8 @@
 
 namespace Base\Controller;
 
+use Base\Router\ActionOptions;
+
 class BaseHtmlController extends HtmlController
 {
     // Заголовок html-страницы (для тега <title>)
@@ -14,10 +16,10 @@ class BaseHtmlController extends HtmlController
     protected string $viewsFolder;
 
     public function __construct(
-        protected object $action
+        protected ActionOptions $action
     ) {
         $this->template = $action->template;
-        $this->viewsFolder = $action->views_folder;
+        $this->viewsFolder = $action->viewsFolder;
     }
 
     /**

@@ -32,4 +32,4 @@ $inputServer = new InputServerDto(
     trim(parse_url(filter_input(INPUT_SERVER, 'REQUEST_URI'), PHP_URL_PATH), '/'),
 );
 
-return new Application(new DB($dbConnection), $config, $inputServer);
+return (new Application(new DB($dbConnection), $config, $inputServer))->getContainer();

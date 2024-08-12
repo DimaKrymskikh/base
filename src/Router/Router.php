@@ -1,17 +1,18 @@
 <?php
 
-namespace Base\Support;
+namespace Base\Router;
 
-use Base\Foundation\Application;
+use Base\Container\Container;
 
 final class Router
 {
     private array $routers = [];
 
     public function __construct(
-        private Application $app
-    )
-    {}
+        private Container $container
+    ) {
+        //
+    }
 
     /**
      * Добавляет в контейнер приложения контроллер и данные, необходимые этому контроллеру
@@ -20,57 +21,61 @@ final class Router
      */
     public function setAction(): void
     {
-        $appUri = $this->app->make('config')->app_url;
+        $appUri = $this->container->get('config')->app_url;
         
-        $requestUri = explode('/', trim($this->app->make('request')->uri, '/'));
+        $requestUri = explode('/', trim($this->container->get('request')->uri, '/'));
         
         // Перебираем все возможные маршруты до первого найденного
         foreach ($this->routers as $router) {
             // Методы запроса должны совпадать
-            if (mb_strtolower($this->app->make('request')->method) !== mb_strtolower($router->method)) {
+            if (mb_strtolower($this->container->get('request')->method) !== mb_strtolower($router->method)) {
                 continue;
             }
             // Разбитые на части полученный $uri и паттерн должны иметь равное число частей
-            $patternUri = explode('/', trim($router->pattern, '/'));
-            if (count($requestUri) !== count($patternUri)) {
+            if (count($requestUri) !== count($router->patternChunks)) {
                 continue;
             }
             // Сравнивая части $uri и паттерна, находим аргументы экшена
-            $arrArg = [];
             $nCoincidence = 0;
-            foreach ($patternUri as $key => $part) {
+            foreach ($router->patternChunks as $key => $part) {
                 // Если часть паттерна заключена в фигурные скобки, то соответствующая часть $uri - аргумент экшена
                 if (str_starts_with($part, '{') && str_ends_with($part, '}')) {
-                    $arrArg[] = $requestUri[$key];
+                    $router->pushActionArguments($requestUri[$key]);
                     $nCoincidence++;
                     // Если часть паттерна без фигурных скобок, то она должна равняться соответствующей части $uri
-                } elseif ($patternUri[$key] === $requestUri[$key]) {
+                } elseif ($router->patternChunks[$key] === $requestUri[$key]) {
                     $nCoincidence++;
                 }
             }
             // Если по всем частям $uri и паттерна найдены совпадения, то добавляем в контейнер контроллер маршрута
             // и данные, необходимые этому контроллеру
-            if ($nCoincidence === count($patternUri)) {
-                $this->app->bind('action', fn (): object => (object) [
-                        'controller' => $router->controller,
-                        'action' => $router->action,
-                        'arr_arg' => $arrArg,
-                        'template' => $appUri.$this->app->make('request')->module->template,
-                        'views_folder' => $appUri.$this->app->make('request')->module->views_folder,
-                    ]);
+            if ($nCoincidence === count($router->patternChunks)) {
+                $this->container->set(
+                        'action',
+                        new ActionOptions(
+                            $router->controller,
+                            $router->action,
+                            $router->getActionArguments(),
+                            $appUri.$this->container->get('request')->module->template,
+                            $appUri.$this->container->get('request')->module->views_folder,
+                        )
+                    );
                 return;
             }
         }
         
         // Если по всем частям $uri и паттерна не найдены совпадения, то добавляем в контейнер контроллер для ошибок
         // и данные, необходимые этому контроллеру
-        $this->app->bind('action', fn (): object => (object) [
-                'controller' => $this->app->make('config')->error_router->controller,
-                'action' => $this->app->make('config')->error_router->action,
-                'arr_arg' => ['Страница не найдена'],
-                'template' => $appUri.$this->app->make('config')->error_router->template,
-                'views_folder' => $appUri.$this->app->make('config')->error_router->views_folder,
-            ]);
+        $this->container->set(
+                'action',
+                new ActionOptions(
+                    $this->container->get('config')->error_router->controller,
+                    $this->container->get('config')->error_router->action,
+                    ['Страница не найдена'],
+                    $appUri.$this->container->get('config')->error_router->template,
+                    $appUri.$this->container->get('config')->error_router->views_folder,
+                )
+            );
     }
 
     /**
@@ -123,19 +128,15 @@ final class Router
 
     /**
      * Возвращает объект для добавления в $this->routers
+     * 
      * @param string $method
      * @param string $pattern
      * @param string $controller
      * @param string $action
      * @return object
      */
-    private function getObject(string $method, string $pattern, string $controller, string $action = 'index'): object
+    private function getObject(string $method, string $pattern, string $controller, string $action = 'index'): RouterOptions
     {
-        return (object) [
-            'method' => $method,
-            'pattern' => $pattern,
-            'controller' => $controller,
-            'action' => $action
-        ];
+        return new RouterOptions($method, $pattern, $controller, $action);
     }
 }

@@ -2,9 +2,10 @@
 
 use Base\DataTransferObjects\InputServerDto;
 use Base\Foundation\Application;
+use Base\Router\ActionOptions;
+use Base\Router\Router;
 use Base\Support\DB\DB;
 use Base\Support\Options;
-use Base\Support\Router;
 use PHPUnit\Framework\TestCase;
 use Tests\Sources\Controllers\Html\HtmlController;
 use Tests\Sources\Controllers\Html\ErrorController;
@@ -35,16 +36,17 @@ class BaseHtmlControllerTest extends TestCase
         $inputServer = new InputServerDto('get', 'test');
         $finishedСonfig = (new Options($this->config))->config;
         
-        $app = new Application($db, $finishedСonfig, $inputServer);
+        $container = (new Application($db, $finishedСonfig, $inputServer))->getContainer();
 
-        $router = new Router($app);
+        $router = new Router($container);
         // метод и uri соответствуют запросу
         $router->get('test', HtmlController::class, 'action');
         $router->setAction();
         
-        $appAction = $app->make('action');
-        $str = [new $appAction->controller($appAction), $appAction->action](...$appAction->arr_arg);
+        $appAction = $container->get('action');
+        $str = [new $appAction->controller($appAction), $appAction->action](...$appAction->actionArguments);
 
+        $this->assertInstanceOf(ActionOptions::class, $appAction);
         $this->assertEquals('begin value a=5 b=x end', $str);
     }
 
@@ -54,16 +56,17 @@ class BaseHtmlControllerTest extends TestCase
         $inputServer = new InputServerDto('post', 'test');
         $finishedСonfig = (new Options($this->config))->config;
         
-        $app = new Application($db, $finishedСonfig, $inputServer);
+        $container = (new Application($db, $finishedСonfig, $inputServer))->getContainer();
 
-        $router = new Router($app);
+        $router = new Router($container);
         // метод не соответствует запросу
         $router->get('test', HtmlController::class, 'action');
         $router->setAction();
         
-        $appAction = $app->make('action');
-        $str = [new $appAction->controller($appAction), $appAction->action](...$appAction->arr_arg);
+        $appAction = $container->get('action');
+        $str = [new $appAction->controller($appAction), $appAction->action](...$appAction->actionArguments);
 
+        $this->assertInstanceOf(ActionOptions::class, $appAction);
         $this->assertEquals('error Страница не найдена error', $str);
     }
 }
