@@ -1,11 +1,25 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<phpunit
+<phpunit 
     cacheResult="false"
     displayDetailsOnTestsThatTriggerDeprecations="true"
+    colors="true"
 >
     <testsuites>
         <testsuite name="base">
             <directory>tests</directory>
         </testsuite>
     </testsuites>
+    <source>
+        <include>
+            <directory suffix=".php">src</directory>
+        </include>
+    </source>
+    <coverage includeUncoveredFiles="true"
+              pathCoverage="true"
+              ignoreDeprecatedCodeUnits="true"
+              disableCodeCoverageIgnore="true"
+    >
+        <report>
+            <text outputFile="coverage.txt" showUncoveredFiles="true" showOnlySummary="false"/>
+        </report>
+    </coverage>
 </phpunit>

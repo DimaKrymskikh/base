@@ -3,3 +3,6 @@
 
 # Это генерирует Composer
 /vendor/
+
+# Покрытие тестов
+coverage.txt
