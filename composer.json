@@ -14,6 +14,7 @@
         "test": "phpunit"
     },
     "require": {
-        "psr/container": "^2.0"
+        "psr/container": "^2.0",
+        "psr/log": "^3.0"
     }
 }
