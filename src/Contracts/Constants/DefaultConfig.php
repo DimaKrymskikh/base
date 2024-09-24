@@ -3,7 +3,7 @@
 namespace Base\Contracts\Constants;
 
 /*
- * Дефолтные настройка конфигурации.
+ * Дефолтные настройки конфигурации.
  * Маршруты указаны относительно app_url
  */
 enum DefaultConfig: string
@@ -13,4 +13,8 @@ enum DefaultConfig: string
     case ErrorController = 'App\Controllers\ErrorController';
     case ErrorAction = 'index';
     case ErrorTemplate = '/Views/errorTemplate.php';
+    case LogsAssetsFolder = '../storage/logs/assets';
+    case LogsErrorsFolder = '../storage/logs/errors';
+    case LogsAssetsFile = 'assets';
+    case LogsErrorsFile = 'errors';
 }

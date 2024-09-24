@@ -50,4 +50,21 @@ class Config
             ]
         ];
     }
+    
+    public static function getConfigWithLogs(): object
+    {
+        return $config = (object)[
+            'app_url' => 'test',
+            'logs' => (object) [
+                'assets' => (object) [
+                    'folder' => '/storage/logs/assets',
+                    'file' => 'ass',
+                ],
+                'errors' => (object) [
+                    'folder' => '/storage/logs/errors',
+                    'file' => 'err',
+                ]
+            ]
+        ];
+    }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use Base\Contracts\Constants\DefaultConfig;
 use Base\Support\Options;
 use PHPUnit\Framework\TestCase;
 use Tests\Sources\config\Config;
@@ -22,15 +23,25 @@ class OptionsTest extends TestCase
     {
         $this->assertEquals((object) [
             'app_url' => 'test',
-            'template' => '/Views/template.php',
-            'views_folder' => '/Views/',
+            'template' => DefaultConfig::Template->value,
+            'views_folder' => DefaultConfig::ViewsFolder->value,
             'error_router' => (object) [
-                'controller' => 'App\Controllers\ErrorController',
-                'action' => 'index',
-                'template' => '/Views/errorTemplate.php',
-                'views_folder' => '/Views/'
+                'controller' => DefaultConfig::ErrorController->value,
+                'action' => DefaultConfig::ErrorAction->value,
+                'template' => DefaultConfig::ErrorTemplate->value,
+                'views_folder' => DefaultConfig::ViewsFolder->value,
             ],
-            'modules' => []
+            'modules' => [],
+            'logs' => (object) [
+                'assets' => (object) [
+                    'folder' => DefaultConfig::LogsAssetsFolder->value,
+                    'file' => DefaultConfig::LogsAssetsFile->value,
+                ],
+                'errors' => (object) [
+                    'folder' => DefaultConfig::LogsErrorsFolder->value,
+                    'file' => DefaultConfig::LogsErrorsFile->value,
+                ]
+            ]
         ], (new Options(Config::getDefaultConfig()))->config);
     }
     
@@ -39,14 +50,24 @@ class OptionsTest extends TestCase
         $this->assertEquals((object) [
             'app_url' => 'test',
             'template' => '/Views/Layout/template.php',
-            'views_folder' => '/Views/',
+            'views_folder' => DefaultConfig::ViewsFolder->value,
             'error_router' => (object) [
                 'controller' => 'App\Controllers\DefaultController',
-                'action' => 'index',
+                'action' => DefaultConfig::ErrorAction->value,
                 'template' => '/Views/Layout/errorTemplate.php',
-                'views_folder' => '/Views/'
+                'views_folder' => DefaultConfig::ViewsFolder->value,
             ],
-            'modules' => []
+            'modules' => [],
+            'logs' => (object) [
+                'assets' => (object) [
+                    'folder' => DefaultConfig::LogsAssetsFolder->value,
+                    'file' => DefaultConfig::LogsAssetsFile->value,
+                ],
+                'errors' => (object) [
+                    'folder' => DefaultConfig::LogsErrorsFolder->value,
+                    'file' => DefaultConfig::LogsErrorsFile->value,
+                ]
+            ]
         ], (new Options( Config::getConfigWithoutModules() ))->config);
     }
     
@@ -54,12 +75,12 @@ class OptionsTest extends TestCase
     {
         $this->assertEquals((object) [
             'app_url' => 'test',
-            'template' => '/Views/template.php',
+            'template' => DefaultConfig::Template->value,
             'views_folder' => '/Http/Views/',
             'error_router' => (object) [
-                'controller' => 'App\Controllers\ErrorController',
+                'controller' => DefaultConfig::ErrorController->value,
                 'action' => 'action',
-                'template' => '/Views/errorTemplate.php',
+                'template' => DefaultConfig::ErrorTemplate->value,
                 'views_folder' => '/Http/Views/error/'
             ],
             'modules' => [
@@ -72,7 +93,43 @@ class OptionsTest extends TestCase
                     'views_folder' => '/app/ModuleTwo/Views/',
                     'template' => '/app/ModuleTwo/Views/template.php',
                 ],
+            ],
+            'logs' => (object) [
+                'assets' => (object) [
+                    'folder' => DefaultConfig::LogsAssetsFolder->value,
+                    'file' => DefaultConfig::LogsAssetsFile->value,
+                ],
+                'errors' => (object) [
+                    'folder' => DefaultConfig::LogsErrorsFolder->value,
+                    'file' => DefaultConfig::LogsErrorsFile->value,
+                ]
             ]
         ], (new Options( Config::getConfigWithModules() ))->config);
+    }
+    
+    public function test_config_with_logs(): void
+    {
+        $this->assertEquals((object) [
+            'app_url' => 'test',
+            'template' => DefaultConfig::Template->value,
+            'views_folder' => DefaultConfig::ViewsFolder->value,
+            'error_router' => (object) [
+                'controller' => DefaultConfig::ErrorController->value,
+                'action' => DefaultConfig::ErrorAction->value,
+                'template' => DefaultConfig::ErrorTemplate->value,
+                'views_folder' => DefaultConfig::ViewsFolder->value,
+            ],
+            'modules' => [],
+            'logs' => (object) [
+                'assets' => (object) [
+                    'folder' => '/storage/logs/assets',
+                    'file' => 'ass',
+                ],
+                'errors' => (object) [
+                    'folder' => '/storage/logs/errors',
+                    'file' => 'err',
+                ]
+            ]
+        ], (new Options(Config::getConfigWithLogs()))->config);
     }
 }

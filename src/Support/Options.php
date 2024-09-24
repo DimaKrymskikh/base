@@ -44,6 +44,17 @@ readonly class Options
         // Сохраняем поле modules
         $appConfig->modules = isset($config->modules) ? $config->modules : [];
         
+        $appConfig->logs = (object) [
+            'assets' => (object) [
+                'folder' => $config->logs?->assets?->folder ?? DefaultConfig::LogsAssetsFolder->value,
+                'file' => $config->logs?->assets?->file ?? DefaultConfig::LogsAssetsFile->value,
+            ],
+            'errors' => (object) [
+                'folder' => $config->logs?->errors?->folder ?? DefaultConfig::LogsErrorsFolder->value,
+                'file' => $config->logs?->errors?->file ?? DefaultConfig::LogsErrorsFile->value,
+            ]
+        ];
+        
         return $appConfig;
     }
 }
