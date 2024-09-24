@@ -25,7 +25,7 @@ final class LoggerService extends AbstractLogger
         $file = $this->getLogFile($level).'-'.$this->now->format('Y-m-d').'.log';
         
         $text = sprintf(
-                '[%s] %s: %s',
+                "[%s] %s: %s \n\n",
                 $this->now->format('Y-m-d H:i:s'),
                 $level,
                 $this->interpolate($message, $context)
