@@ -62,4 +62,10 @@ class BaseHtmlController extends HtmlController
     {
         return filter_input(INPUT_SERVER, 'HTTP_X_REQUESTED_WITH') ? $this->renderContent($this->viewsFolder.$file, $data) : $this->render($file, $data);
     }
+    
+    protected function redirect(string $uri, int $code = 303): void
+    {
+        header('Location: http://'.$_SERVER['HTTP_HOST'].'/'.trim($uri,'/'), true, $code);
+        exit();
+    }
 }
