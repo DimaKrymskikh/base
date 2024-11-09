@@ -3,6 +3,7 @@
 namespace Base\Controller;
 
 use Base\Router\ActionOptions;
+use Base\Services\FlashMessages\FlashMessagesService;
 
 class BaseHtmlController extends HtmlController
 {
@@ -14,10 +15,13 @@ class BaseHtmlController extends HtmlController
     protected string $template;
     // Папка, в которой находятся представления
     protected string $viewsFolder;
+    
+    protected FlashMessagesService $flashMessages;
 
-    public function __construct(
-        protected ActionOptions $action
-    ) {
+    public function __construct(ActionOptions $action)
+    {
+        $this->flashMessages = new FlashMessagesService();
+        
         $this->template = $action->template;
         $this->viewsFolder = $action->viewsFolder;
     }
