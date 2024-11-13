@@ -7,6 +7,7 @@ use PHPUnit\Framework\TestCase;
 class PoliticsServiceTest extends TestCase
 {
     private PoliticsService $politics;
+    
     private const NOT_ADMIN_USER = [
                     'login' => 'A1',
                     'email' => 'q@m.com',

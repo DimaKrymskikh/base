@@ -4,7 +4,7 @@ namespace Base\Services\Politics;
 
 use Base\Services\User\UserServiceInterface;
 
-final class PoliticsService
+final class PoliticsService implements PoliticsServiceInterface
 {
     private static ?PoliticsService $instance = null;
     
