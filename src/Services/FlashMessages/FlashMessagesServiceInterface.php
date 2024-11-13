@@ -7,4 +7,6 @@ interface FlashMessagesServiceInterface
     public function createFlashMessage(string $name, string $message): void;
     
     public function getFlashMessage(string $name): string;
+    
+    public function destroy(): void;
 }

@@ -28,4 +28,9 @@ final class FlashMessagesService implements FlashMessagesServiceInterface
         
         return $flashMessage;
     }
+    
+    public function destroy(): void
+    {
+        unset($_SESSION[self::FLASH_MESSAGE]);
+    }
 }
