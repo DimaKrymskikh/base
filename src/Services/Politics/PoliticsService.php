@@ -44,14 +44,4 @@ final class PoliticsService implements PoliticsServiceInterface
     {
         return isset($_SESSION['user']) && isset($_SESSION['user']->is_admin) && $_SESSION['user']->is_admin;
     }
-    
-    public function getLogin(): string
-    {
-        return $_SESSION['user']?->login ?? '';
-    }
-    
-    public function getEmail(): string
-    {
-        return $_SESSION['user']?->email ?? '';
-    }
 }

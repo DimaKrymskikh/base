@@ -15,8 +15,4 @@ interface PoliticsServiceInterface
     public function isAuth(): bool;
     
     public function isAdmin(): bool;
-    
-    public function getLogin(): string;
-    
-    public function getEmail(): string;
 }

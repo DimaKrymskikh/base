@@ -88,39 +88,9 @@ class PoliticsServiceTest extends TestCase
         
         $this->politics->create($user);
         
-        $this->assertSame($this->politics->getLogin(), $_SESSION['user']->login);
-        $this->assertSame($this->politics->getEmail(), $_SESSION['user']->email);
+        $this->assertSame(self::NOT_ADMIN_USER['login'], $_SESSION['user']->login);
+        $this->assertSame(self::NOT_ADMIN_USER['email'], $_SESSION['user']->email);
         $this->assertSame($this->politics->isAdmin(), $_SESSION['user']->is_admin);
-    }
-
-    public function test_get_methods_return_empty_string_if_user_is_not_in_session(): void
-    {
-        $this->assertSame('', $this->politics->getLogin());
-        $this->assertSame('', $this->politics->getEmail());
-    }
-
-    public function test_get_methods_return_empty_string_if_user_session_is_null(): void
-    {
-        $_SESSION['user'] = null;
-        
-        $this->assertSame('', $this->politics->getLogin());
-        $this->assertSame('', $this->politics->getEmail());
-    }
-
-    public function test_get_methods_return_empty_string_if_user_session_is_empty_string(): void
-    {
-        $_SESSION['user'] = '';
-        
-        $this->assertSame('', $this->politics->getLogin());
-        $this->assertSame('', $this->politics->getEmail());
-    }
-
-    public function test_get_methods_return_empty_string_if_user_session_is_empty_object(): void
-    {
-        $_SESSION['user'] = (object) [];
-        
-        $this->assertSame('', $this->politics->getLogin());
-        $this->assertSame('', $this->politics->getEmail());
     }
 
     public function test_destroy_method_unset_user_from_session(): void
