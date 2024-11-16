@@ -2,7 +2,7 @@
 
 namespace Base\Services\User;
 
-interface UserServiceInterface
+interface BaseUserServiceInterface
 {
     public function getUser(): object;
 }

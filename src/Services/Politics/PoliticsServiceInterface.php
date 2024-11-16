@@ -2,11 +2,11 @@
 
 namespace Base\Services\Politics;
 
-use Base\Services\User\UserServiceInterface;
+use Base\Services\User\BaseUserServiceInterface;
 
 interface PoliticsServiceInterface
 {
-    public function create(UserServiceInterface $user): void;
+    public function create(BaseUserServiceInterface $user): void;
     
     public function destroy(): void;
     

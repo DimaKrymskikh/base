@@ -1,7 +1,7 @@
 <?php
 
 use Base\Services\Politics\PoliticsService;
-use Base\Services\User\UserServiceInterface;
+use Base\Services\User\BaseUserServiceInterface;
 use PHPUnit\Framework\TestCase;
 
 class PoliticsServiceTest extends TestCase
@@ -82,7 +82,7 @@ class PoliticsServiceTest extends TestCase
 
     public function test_create_method_save_user_in_session(): void
     {
-        $user = $this->createStub(UserServiceInterface::class);
+        $user = $this->createStub(BaseUserServiceInterface::class);
         $user->method('getUser')
                 ->willReturn((object) self::NOT_ADMIN_USER);
         

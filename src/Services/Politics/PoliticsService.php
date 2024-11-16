@@ -2,7 +2,7 @@
 
 namespace Base\Services\Politics;
 
-use Base\Services\User\UserServiceInterface;
+use Base\Services\User\BaseUserServiceInterface;
 
 final class PoliticsService implements PoliticsServiceInterface
 {
@@ -20,7 +20,7 @@ final class PoliticsService implements PoliticsServiceInterface
     private function __construct()
     {}
 
-    public function create(UserServiceInterface $user): void
+    public function create(BaseUserServiceInterface $user): void
     {
         $_SESSION['user'] = $user->getUser();
     }
