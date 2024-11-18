@@ -51,11 +51,11 @@ class FlashMessagesServiceTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->flashMessages = new FlashMessagesService();
+        $this->flashMessages = FlashMessagesService::getInstance();
     }
     
     protected function tearDown(): void
     {
-        unset($_SESSION[self::FLASH_MESSAGE]);
+        $this->flashMessages->destroy();
     }
 }

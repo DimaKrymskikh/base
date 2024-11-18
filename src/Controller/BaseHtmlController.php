@@ -20,7 +20,7 @@ class BaseHtmlController extends HtmlController
 
     public function __construct(ActionOptions $action)
     {
-        $this->flashMessages = new FlashMessagesService();
+        $this->flashMessages = FlashMessagesService::getInstance();
         
         $this->template = $action->template;
         $this->viewsFolder = $action->viewsFolder;
