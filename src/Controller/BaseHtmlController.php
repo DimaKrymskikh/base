@@ -69,7 +69,6 @@ class BaseHtmlController extends HtmlController
     
     protected function redirect(string $uri, int $code = 303): void
     {
-        header('Location: http://'.$_SERVER['HTTP_HOST'].'/'.trim($uri,'/'), true, $code);
-        exit();
+        header('Location: http://'.filter_input(INPUT_SERVER, 'HTTP_HOST').'/'.trim($uri,'/'), true, $code);
     }
 }
