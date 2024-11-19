@@ -18,6 +18,11 @@ final class FilterRequest implements FilterRequestInterface
     private function __construct()
     {}
 
+    public function filterInputGet(string $name): string
+    {
+        return filter_input(INPUT_GET, $name) ?: '';
+    }
+
     public function filterInputPost(string $name): string
     {
         return filter_input(INPUT_POST, $name) ?: '';
