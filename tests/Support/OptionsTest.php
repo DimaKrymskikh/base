@@ -21,7 +21,7 @@ class OptionsTest extends TestCase
      */
     public function test_default_config(): void
     {
-        $this->assertEquals((object) [
+        $this->assertEqualsCanonicalizing((object) [
             'app_url' => 'test',
             'template' => DefaultConfig::Template->value,
             'views_folder' => DefaultConfig::ViewsFolder->value,
@@ -30,6 +30,9 @@ class OptionsTest extends TestCase
                 'action' => DefaultConfig::ErrorAction->value,
                 'template' => DefaultConfig::ErrorTemplate->value,
                 'views_folder' => DefaultConfig::ViewsFolder->value,
+            ],
+            'pagination' => (object) [
+                'view' => DefaultConfig::PaginationView
             ],
             'modules' => [],
             'logs' => (object) [
@@ -47,7 +50,7 @@ class OptionsTest extends TestCase
     
     public function test_config_without_modules(): void
     {
-        $this->assertEquals((object) [
+        $this->assertEqualsCanonicalizing((object) [
             'app_url' => 'test',
             'template' => '/Views/Layout/template.php',
             'views_folder' => DefaultConfig::ViewsFolder->value,
@@ -56,6 +59,9 @@ class OptionsTest extends TestCase
                 'action' => DefaultConfig::ErrorAction->value,
                 'template' => '/Views/Layout/errorTemplate.php',
                 'views_folder' => DefaultConfig::ViewsFolder->value,
+            ],
+            'pagination' => (object) [
+                'view' => DefaultConfig::PaginationView
             ],
             'modules' => [],
             'logs' => (object) [
@@ -73,7 +79,7 @@ class OptionsTest extends TestCase
     
     public function test_config_with_modules(): void
     {
-        $this->assertEquals((object) [
+        $this->assertEqualsCanonicalizing((object) [
             'app_url' => 'test',
             'template' => DefaultConfig::Template->value,
             'views_folder' => '/Http/Views/',
@@ -82,6 +88,9 @@ class OptionsTest extends TestCase
                 'action' => 'action',
                 'template' => DefaultConfig::ErrorTemplate->value,
                 'views_folder' => '/Http/Views/error/'
+            ],
+            'pagination' => (object) [
+                'view' => DefaultConfig::PaginationView
             ],
             'modules' => [
                 'module_one' => (object) [
@@ -109,7 +118,7 @@ class OptionsTest extends TestCase
     
     public function test_config_with_logs(): void
     {
-        $this->assertEquals((object) [
+        $this->assertEqualsCanonicalizing((object) [
             'app_url' => 'test',
             'template' => DefaultConfig::Template->value,
             'views_folder' => DefaultConfig::ViewsFolder->value,
@@ -118,6 +127,9 @@ class OptionsTest extends TestCase
                 'action' => DefaultConfig::ErrorAction->value,
                 'template' => DefaultConfig::ErrorTemplate->value,
                 'views_folder' => DefaultConfig::ViewsFolder->value,
+            ],
+            'pagination' => (object) [
+                'view' => DefaultConfig::PaginationView
             ],
             'modules' => [],
             'logs' => (object) [
