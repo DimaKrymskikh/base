@@ -63,7 +63,7 @@ readonly class Options
     private function setPaginationObtions(object $config): object
     {
         return (object) [
-            'view' => $config->pagination?->view ?? DefaultConfig::PaginationView
+            'view' => $config->pagination?->view ?? DefaultConfig::PaginationView->value
         ];
     }
 }
