@@ -18,6 +18,7 @@ final class Application
         $this->container = new Container();
         
         $this->container->set('db', $db);
+        $this->container->set('inputServer', $inputServer);
         
         // Если в конфигурации приложения не заданы некоторые параметры, берём дефолтные
         $finishedConfig = (new Options($config))->config;
