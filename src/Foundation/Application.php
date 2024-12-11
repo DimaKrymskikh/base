@@ -5,6 +5,7 @@ namespace Base\Foundation;
 use Base\Container\Container;
 use Base\DataTransferObjects\InputServerDto;
 use Base\Support\DB\DB;
+use Base\Support\Filter\FilterRequest;
 use Base\Support\Options;
 use Base\Support\Request;
 
@@ -19,6 +20,7 @@ final class Application
         
         $this->container->set('db', $db);
         $this->container->set('inputServer', $inputServer);
+        $this->container->set('filterRequest', FilterRequest::getInstance());
         
         // Если в конфигурации приложения не заданы некоторые параметры, берём дефолтные
         $finishedConfig = (new Options($config))->config;
