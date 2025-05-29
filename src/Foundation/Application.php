@@ -7,6 +7,8 @@ use Base\Server\CsrfProtection;
 use Base\Server\ServerRequest;
 use Base\Support\DB\DB;
 use Base\Support\DB\DBconnection;
+use Base\Support\Options;
+use Base\Support\RequestModule;
 
 final class Application
 {
@@ -23,7 +25,7 @@ final class Application
         
         $this->container->set('db', new DB( new DBconnection($config->db) ));
 
-        $finishedConfig = (new Options($this->config))->config;
+        $finishedConfig = (new Options($config))->config;
         $this->container->set('config', $finishedConfig);
 
         $this->container->set('requestModule', (new RequestModule($finishedConfig, $serverRequest))->request);
