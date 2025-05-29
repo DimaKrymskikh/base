@@ -1,11 +1,10 @@
 <?php
 
 use Base\Container\Container;
-use Base\DataTransferObjects\InputServerDto;
-use Base\Foundation\Application;
 use Base\Router\Router;
-use Base\Support\DB\DB;
+use Base\Server\ServerRequestInterface;
 use Base\Support\Options;
+use Base\Support\RequestModule;
 use PHPUnit\Framework\TestCase;
 use Tests\Sources\Controllers\FooController;
 use Tests\Sources\Controllers\BarController;
@@ -18,8 +17,7 @@ class RouterTest extends TestCase
 
     public function test_slash(): void
     {
-        $config = (new Options( Config::getConfigWithModules() ))->config;
-        $this->runRouters($config, 'get', '/');
+        $this->runRouters('get', '/');
 
         $action = $this->container->get('action');
         $this->assertEquals(FooController::class, $action->controller);
@@ -31,8 +29,7 @@ class RouterTest extends TestCase
 
     public function test_foo(): void
     {
-        $config = (new Options( Config::getConfigWithModules() ))->config;
-        $this->runRouters($config, 'get', 'foo');
+        $this->runRouters('get', 'foo');
 
         $action = $this->container->get('action');
         $this->assertEquals(FooController::class, $action->controller);
@@ -45,8 +42,7 @@ class RouterTest extends TestCase
     // Страница не найдена
     public function test_foobag(): void
     {
-        $config = (new Options( Config::getConfigWithModules() ))->config;
-        $this->runRouters($config, 'get', 'foobag');
+        $this->runRouters('get', 'foobag');
 
         $action = $this->container->get('action');
         // Дефолтный контроллер
@@ -60,8 +56,7 @@ class RouterTest extends TestCase
 
     public function test_get(): void
     {
-        $config = (new Options( Config::getConfigWithModules() ))->config;
-        $this->runRouters($config, 'get', '/foo/4');
+        $this->runRouters('get', '/foo/4');
 
         $action = $this->container->get('action');
         $this->assertEquals(FooController::class, $action->controller);
@@ -73,8 +68,7 @@ class RouterTest extends TestCase
 
     public function test_post(): void
     {
-        $config = (new Options( Config::getConfigWithModules() ))->config;
-        $this->runRouters($config, 'POST', '/foo/4');
+        $this->runRouters('POST', '/foo/4');
 
         $action = $this->container->get('action');
         $this->assertEquals(FooController::class, $action->controller);
@@ -86,8 +80,7 @@ class RouterTest extends TestCase
 
     public function test_put(): void
     {
-        $config = (new Options( Config::getConfigWithModules() ))->config;
-        $this->runRouters($config, 'put', 'foo/4/77');
+        $this->runRouters('put', 'foo/4/77');
 
         $action = $this->container->get('action');
         $this->assertEquals(FooController::class, $action->controller);
@@ -99,8 +92,7 @@ class RouterTest extends TestCase
 
     public function test_delete(): void
     {
-        $config = (new Options( Config::getConfigWithModules() ))->config;
-        $this->runRouters($config, 'DELETE', 'foo/4/str/abcd');
+        $this->runRouters('DELETE', 'foo/4/str/abcd');
 
         $action = $this->container->get('action');
         $this->assertEquals(FooController::class, $action->controller);
@@ -112,8 +104,7 @@ class RouterTest extends TestCase
 
     public function test_bar(): void
     {
-        $config = (new Options( Config::getConfigWithModules() ))->config;
-        $this->runRouters($config, 'GET', 'bar');
+        $this->runRouters('GET', 'bar');
 
         $action = $this->container->get('action');
         $this->assertEquals(BarController::class, $action->controller);
@@ -125,8 +116,7 @@ class RouterTest extends TestCase
 
     public function test_bar_get(): void
     {
-        $config = (new Options( Config::getConfigWithModules() ))->config;
-        $this->runRouters($config, 'GET', '/bar/str/2');
+        $this->runRouters('GET', '/bar/str/2');
 
         $action = $this->container->get('action');
         $this->assertEquals(BarController::class, $action->controller);
@@ -138,8 +128,7 @@ class RouterTest extends TestCase
 
     public function test_bar_post(): void
     {
-        $config = (new Options( Config::getConfigWithModules() ))->config;
-        $this->runRouters($config, 'post', '/bar/str/8/str2/aaaa/bbb/str3');
+        $this->runRouters('post', '/bar/str/8/str2/aaaa/bbb/str3');
 
         $action = $this->container->get('action');
         $this->assertEquals(BarController::class, $action->controller);
@@ -151,8 +140,7 @@ class RouterTest extends TestCase
 
     public function test_bar_put(): void
     {
-        $config = (new Options( Config::getConfigWithModules() ))->config;
-        $this->runRouters($config, 'pUt', '/bar/str/aa/str2/str3');
+        $this->runRouters('pUt', '/bar/str/aa/str2/str3');
 
         $action = $this->container->get('action');
         $this->assertEquals(BarController::class, $action->controller);
@@ -164,8 +152,7 @@ class RouterTest extends TestCase
 
     public function test_bar_delete(): void
     {
-        $config = (new Options( Config::getConfigWithModules() ))->config;
-        $this->runRouters($config, 'DelEte', 'bar/aaaaa/bbb/str2/str3');
+        $this->runRouters('DelEte', 'bar/aaaaa/bbb/str2/str3');
 
         $action = $this->container->get('action');
         $this->assertEquals(BarController::class, $action->controller);
@@ -177,9 +164,7 @@ class RouterTest extends TestCase
 
     public function test_non_existent_uri(): void
     {
-        $config = (new Options( Config::getConfigWithModules() ))->config;
-        $this->runRouters($config, 'get', 'baz');
-        $this->router->setAction();
+        $this->runRouters('get', 'baz');
 
         $action = $this->container->get('action');
         $this->assertEquals('App\Controllers\ErrorController', $action->controller);
@@ -191,8 +176,7 @@ class RouterTest extends TestCase
 
     public function test_existent_uri_and_wrong_method(): void
     {
-        $config = (new Options( Config::getConfigWithModules() ))->config;
-        $this->runRouters($config, 'get', 'bar/str/aa/str2/str3');
+        $this->runRouters('get', 'bar/str/aa/str2/str3');
 
         $action = $this->container->get('action');
         $this->assertEquals('App\Controllers\ErrorController', $action->controller);
@@ -202,11 +186,17 @@ class RouterTest extends TestCase
         $this->assertEquals('test/Http/Views/error/', $action->viewsFolder);
     }
     
-    private function runRouters(object $config, string $method, string $uri): void
+    private function runRouters(string $method, string $uri): void
     {
-        $db = $this->createStub(DB::class);
-        $inputServer = new InputServerDto($method, $uri);
-        $this->container = (new Application($db, $config, $inputServer))->getContainer();
+        $config = (new Options( Config::getConfigWithModules() ))->config;
+        $serverRequest = $this->createStub(ServerRequestInterface::class);
+        
+        $serverRequest->method('getMethod')->willReturn($method);
+        $serverRequest->method('getUri')->willReturn($uri);
+        
+        $this->container = new Container();
+        $this->container->set('config', $config);
+        $this->container->set('requestModule', (new RequestModule($config, $serverRequest))->request);
 
         $this->router = new Router($this->container);
 

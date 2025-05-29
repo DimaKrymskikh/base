@@ -35,8 +35,8 @@ final class ModuleRegistration
         // Если в модуле не определено какое-то поле, берём главное поле конфигурации
         if($givenModul) {
             $requestModule = (object) [
-                'views_folder' => isset($givenModul->views_folder) ? $givenModul->views_folder : $this->config->views_folder,
-                'template' => isset($givenModul->template) ? $givenModul->template : $this->config->template,
+                'views_folder' => $givenModul->views_folder ?? $this->config->views_folder,
+                'template' => $givenModul->template ?? $this->config->template,
             ];
         // Если uri запроса не содержит pattern какого-либо модуля, берём главные поля конфигурации
         } else {

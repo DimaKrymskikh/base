@@ -1,9 +1,6 @@
 <?php
 
-use Base\DataTransferObjects\InputServerDto;
 use Base\Foundation\Application;
-use Base\Support\DB\DB;
-use Base\Support\DB\DBconnection;
 
 /**
  * В этом файле должны быть определены параметры соединения с базой данных
@@ -14,22 +11,20 @@ $options = __DIR__.'/../config/options.php';
 if(file_exists($options)) {
     require_once $options;
 } else {
-    echo "Не задан файл config/options.php";
-    exit;
+    throw new \Exception("Не задан файл config/options.php");
 }
 
 // Получаем параметры конфигурации
-$config = require_once __DIR__ . '/../config/app.php';
+$config = require_once __DIR__.'/../config/app.php';
 
 // В конфигурации приложения обязательно должены быть заданы настройки базы данных
 if(!isset($config->db)) {
     throw new \Exception('В конфигурации не заданы настройки базы данных');
 }
-$dbConnection = new DBconnection($config->db);
 
-$inputServer = new InputServerDto(
-    filter_input(INPUT_SERVER, 'REQUEST_METHOD'),
-    trim(parse_url(filter_input(INPUT_SERVER, 'REQUEST_URI'), PHP_URL_PATH), '/'),
-);
+// В конфигурации приложения обязательно должен быть задан url приложения
+if(!isset($config->app_url)) {
+    throw new \Exception('В конфигурации не задан url приложения');
+}
 
-return (new Application(new DB($dbConnection), $config, $inputServer))->getContainer();
+return (new Application($config))->getContainer();

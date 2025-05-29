@@ -1,5 +1,5 @@
 <?php
-namespace Base\Support\Filter;
+namespace Base\Server;
 
 interface FilterRequestInterface
 {

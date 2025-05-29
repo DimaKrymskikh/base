@@ -7,13 +7,6 @@ use Tests\Sources\config\Config;
 
 class OptionsTest extends TestCase
 {
-    public function test_empty_config(): void
-    {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('В конфигурации не задан url приложения');
-        new Options(Config::getEmptyConfig());
-    }
-    
     /**
      * Задан только url приложения
      * 
@@ -25,6 +18,7 @@ class OptionsTest extends TestCase
             'app_url' => 'test',
             'template' => DefaultConfig::Template->value,
             'views_folder' => DefaultConfig::ViewsFolder->value,
+            'routes_file' => DefaultConfig::RoutesFile->value,
             'error_router' => (object) [
                 'controller' => DefaultConfig::ErrorController->value,
                 'action' => DefaultConfig::ErrorAction->value,
@@ -54,6 +48,7 @@ class OptionsTest extends TestCase
             'app_url' => 'test',
             'template' => '/Views/Layout/template.php',
             'views_folder' => DefaultConfig::ViewsFolder->value,
+            'routes_file' => '/../routes/routes.php',
             'error_router' => (object) [
                 'controller' => 'App\Controllers\DefaultController',
                 'action' => DefaultConfig::ErrorAction->value,
@@ -83,6 +78,7 @@ class OptionsTest extends TestCase
             'app_url' => 'test',
             'template' => DefaultConfig::Template->value,
             'views_folder' => '/Http/Views/',
+            'routes_file' => DefaultConfig::RoutesFile->value,
             'error_router' => (object) [
                 'controller' => DefaultConfig::ErrorController->value,
                 'action' => 'action',
@@ -122,6 +118,7 @@ class OptionsTest extends TestCase
             'app_url' => 'test',
             'template' => DefaultConfig::Template->value,
             'views_folder' => DefaultConfig::ViewsFolder->value,
+            'routes_file' => DefaultConfig::RoutesFile->value,
             'error_router' => (object) [
                 'controller' => DefaultConfig::ErrorController->value,
                 'action' => DefaultConfig::ErrorAction->value,

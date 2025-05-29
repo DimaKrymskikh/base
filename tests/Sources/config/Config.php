@@ -21,6 +21,7 @@ class Config
         return $config = (object)[
             'app_url' => 'test',
             'template' => '/Views/Layout/template.php',
+            'routes_file' => '/../routes/routes.php',
             'error_router' => (object) [
                 'controller' => 'App\Controllers\DefaultController',
                 'template' => '/Views/Layout/errorTemplate.php',

@@ -3,31 +3,30 @@
 namespace Base\Foundation;
 
 use Base\Container\Container;
-use Base\DataTransferObjects\InputServerDto;
+use Base\Server\CsrfProtection;
+use Base\Server\ServerRequest;
 use Base\Support\DB\DB;
-use Base\Support\Filter\FilterRequest;
-use Base\Support\Options;
-use Base\Support\Request;
+use Base\Support\DB\DBconnection;
 
 final class Application
 {
     // Контейнер приложения
     private Container $container;
 
-    public function __construct(DB $db, object $config, InputServerDto $inputServer)
+    public function __construct(object $config)
     {
         $this->container = new Container();
         
-        $this->container->set('db', $db);
-        $this->container->set('inputServer', $inputServer);
-        $this->container->set('filterRequest', FilterRequest::getInstance());
+        $serverRequest = new ServerRequest();
+        (new CsrfProtection($serverRequest))->check();
+        $this->container->set('serverRequest', $serverRequest);
         
-        // Если в конфигурации приложения не заданы некоторые параметры, берём дефолтные
-        $finishedConfig = (new Options($config))->config;
+        $this->container->set('db', new DB( new DBconnection($config->db) ));
+
+        $finishedConfig = (new Options($this->config))->config;
         $this->container->set('config', $finishedConfig);
-        
-        // Определяем настройки, соответствующие запросу
-        $this->container->set('request', (new Request($finishedConfig, $inputServer))->request);
+
+        $this->container->set('requestModule', (new RequestModule($finishedConfig, $serverRequest))->request);
     }
     
     public function getContainer(): Container

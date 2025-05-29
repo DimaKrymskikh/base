@@ -18,4 +18,5 @@ enum DefaultConfig: string
     case LogsAssetsFile = 'assets';
     case LogsErrorsFile = 'errors';
     case PaginationView = '/Views/Pagination/pagination.php';
+    case RoutesFile = '/../routes/web.php';
 }

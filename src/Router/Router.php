@@ -21,14 +21,17 @@ final class Router
      */
     public function setAction(): void
     {
-        $appUri = $this->container->get('config')->app_url;
+        $config = $this->container->get('config');
+        $requestModule = $this->container->get('requestModule');
         
-        $requestUri = explode('/', trim($this->container->get('request')->uri, '/'));
+        $appUri = $config->app_url;
+        
+        $requestUri = explode('/', trim($requestModule->uri, '/'));
         
         // Перебираем все возможные маршруты до первого найденного
         foreach ($this->routers as $router) {
             // Методы запроса должны совпадать
-            if (mb_strtolower($this->container->get('request')->method) !== mb_strtolower($router->method)) {
+            if (mb_strtolower($requestModule->method) !== mb_strtolower($router->method)) {
                 continue;
             }
             // Разбитые на части полученный $uri и паттерн должны иметь равное число частей
@@ -56,8 +59,8 @@ final class Router
                             $router->controller,
                             $router->action,
                             $router->getActionArguments(),
-                            $appUri.$this->container->get('request')->module->template,
-                            $appUri.$this->container->get('request')->module->views_folder,
+                            $appUri.$requestModule->module->template,
+                            $appUri.$requestModule->module->views_folder,
                         )
                     );
                 return;
@@ -69,11 +72,11 @@ final class Router
         $this->container->set(
                 'action',
                 new ActionOptions(
-                    $this->container->get('config')->error_router->controller,
-                    $this->container->get('config')->error_router->action,
+                    $config->error_router->controller,
+                    $config->error_router->action,
                     ['Страница не найдена'],
-                    $appUri.$this->container->get('config')->error_router->template,
-                    $appUri.$this->container->get('config')->error_router->views_folder,
+                    $appUri.$config->error_router->template,
+                    $appUri.$config->error_router->views_folder,
                 )
             );
     }
