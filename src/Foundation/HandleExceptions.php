@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Foundation;
+namespace Base\Foundation;
 
 use Base\Services\LoggerService;
 
