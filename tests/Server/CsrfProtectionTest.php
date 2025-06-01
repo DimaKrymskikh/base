@@ -48,4 +48,9 @@ class CsrfProtectionTest extends TestCase
         
         $this->serverRequest = $this->createStubForIntersectionOfInterfaces([FilterRequestInterface::class, ServerRequestInterface::class]);
     }
+
+    protected function tearDown(): void
+    {
+        unset($_SESSION['csrf_token']);
+    }
 }

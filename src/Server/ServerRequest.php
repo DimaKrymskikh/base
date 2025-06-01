@@ -2,6 +2,8 @@
 
 namespace Base\Server;
 
+use Base\Utils\ArrayUtils;
+
 final class ServerRequest implements FilterRequestInterface, ServerRequestInterface
 {
     private string $method;
@@ -38,5 +40,22 @@ final class ServerRequest implements FilterRequestInterface, ServerRequestInterf
     public function filterInputPost(string $name): string
     {
         return filter_input(INPUT_POST, $name) ?: '';
+    }
+    
+    public function getGlobalArraysAsString(): string
+    {
+        $str = "\nПеременные HTTP GET:\n";
+        $str .= count($_GET) ? ArrayUtils::getArrayAsString($_GET) : "Отсутствуют.\n";
+        
+        $str .= "Переменные HTTP POST:\n";
+        $str .= count($_POST) ? ArrayUtils::getArrayAsString($_POST) : "Отсутствуют.\n";
+        
+        $str .= "HTTP Cookies:\n";
+        $str .= count($_COOKIE) ? ArrayUtils::getArrayAsString($_COOKIE) : "Отсутствуют.\n";
+        
+        $str .= "Информация о сервере и среде исполнения:\n";
+        $str .= count($_SERVER) ? ArrayUtils::getArrayAsString($_SERVER) : "Отсутствует.\n";
+            
+        return $str; 
     }
 }

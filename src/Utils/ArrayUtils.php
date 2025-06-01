@@ -14,6 +14,7 @@ class ArrayUtils
      * Если указать в параметре $key индексированное поле основной таблицы, например, первичный ключ id, в массиве $singles - поля основной таблицы,
      * в массиве $multiples - поля прикреплённой таблицы, то функция выдаст массив объектов с ключами, которые определяет $key, и значениями - объектами,
      * которые состоят из скалярных свойств массива $singles и свойств-массивов из $multiples
+     * 
      * @param array $items - Исходный плоский массив
      * @param string $key - Поле, которое задаст ключи нового массива
      * @param array $singles - Массив полей, которые станут скалярными в новом массиве
@@ -53,5 +54,21 @@ class ArrayUtils
         }
 
         return $newItems;
+    }
+    
+    /**
+     * Возвращает строку, содержащую ключи и значения массива
+     * 
+     * @param array $arr
+     * @return string
+     */
+    public static function getArrayAsString(array $arr): string
+    {
+        $str = '';
+        foreach ($arr as $key => $value) {
+            $str .= "[$key]: $value \n";
+        }
+        
+        return $str;
     }
 }

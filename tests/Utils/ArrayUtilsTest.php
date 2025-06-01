@@ -6,7 +6,7 @@ use Base\Utils\ArrayUtils;
 
 class ArrayUtilsTest extends TestCase
 {
-    public function testFlatToComplex(): void
+    public function test_flatToComplex(): void
     {
         $flatNoRepeats = [
                 (object)[
@@ -108,5 +108,22 @@ class ArrayUtilsTest extends TestCase
         $this->assertEquals($complexNoRepeats, ArrayUtils::flatToComplex($flatNoRepeats, 'id', ['name', 'description']));
         $this->assertEquals($complexWithRepeats, ArrayUtils::flatToComplex($flatWithRepeats, 'id', ['name', 'description'], ['items']));
         $this->assertEquals($complexWithRepeatsD2, ArrayUtils::flatToComplex($flatWithRepeatsD2, 'id', ['name', 'description'], ['items', 'foo']));
+    }
+    
+    public function test_getArrayAsString(): void
+    {
+        $arr = [
+            'a' => 1,
+            'b' => 'test'
+        ];
+        
+        $this->assertEquals("[a]: 1 \n[b]: test \n", ArrayUtils::getArrayAsString($arr));
+    }
+    
+    public function test_getArrayAsString_empty_array(): void
+    {
+        $arr = [];
+        
+        $this->assertEquals('', ArrayUtils::getArrayAsString($arr));
     }
 }
