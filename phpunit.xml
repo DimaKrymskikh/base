@@ -20,6 +20,7 @@
               disableCodeCoverageIgnore="true"
     >
         <report>
+            <html outputDirectory="html-coverage" lowUpperBound="50" highLowerBound="90"/>
             <text outputFile="coverage.txt" showUncoveredFiles="true" showOnlySummary="false"/>
         </report>
     </coverage>
