@@ -18,25 +18,30 @@ class ValidationService implements ValidationServiceInterface
     {
         $rules = $this->split($options, '|');
         
-        $ruleMessages = array_filter($messages, fn($message) =>  is_string($message));
-        
         $errors = [];
         
         foreach ($rules as $rule) {
             $params = [];
-            if (strpos($rule, ':')) {
+            if (mb_strpos($rule, ':')) {
                 [$ruleName, $paramStr] = $this->split($rule, ':');
                 $params = $this->split($paramStr, ',');
             } else {
                 $ruleName = $rule;
             }
             
-            $fn = 'is'.ucfirst($ruleName);
-            if (method_exists($this, $fn)) {
-                $pass = $this->$fn($field, ...$params);
-                if (!$pass) {
-                    $errors[] = sprintf($ruleMessages[$ruleName], $field, ...$params);
-                }
+            $fn = 'is'.mb_ucfirst($ruleName);
+            
+            if(!method_exists($this, $fn)) {
+                throw new \Exception("Задано не существующее правило $ruleName");
+            }
+            
+            if(!isset($messages[$ruleName])) {
+                throw new \Exception("Для правила $ruleName не задано сообщение");
+            }
+            
+            $pass = $this->$fn($field, ...$params);
+            if (!$pass) {
+                $errors[] = sprintf($messages[$ruleName], $field);
             }
         }
         
@@ -53,7 +58,7 @@ class ValidationService implements ValidationServiceInterface
      */
     private function split(string $str, string $separator): array
     {
-        return array_map('trim', explode($separator, $str));
+        return array_map('mb_trim', explode($separator, $str));
     }
     
     /**
@@ -64,7 +69,7 @@ class ValidationService implements ValidationServiceInterface
      */
     private function isRequired(string $field): bool
     {
-        return trim($field) !== '';
+        return $field !== '';
     }
     
     /**
@@ -75,7 +80,7 @@ class ValidationService implements ValidationServiceInterface
      */
     private function isEmail(string $field): bool
     {
-        if (empty($field)) {
+        if ($field === '') {
             return true;
         }
 
@@ -90,7 +95,7 @@ class ValidationService implements ValidationServiceInterface
      */
     private function isAlphanumeric(string $field): bool
     {
-        if (empty($field)) {
+        if ($field === '') {
             return true;
         }
 
@@ -107,7 +112,7 @@ class ValidationService implements ValidationServiceInterface
      */
     private function isBetween(string $field, int $min, int $max): bool
     {
-        if (empty($field)) {
+        if ($field === '') {
             return true;
         }
 
@@ -125,12 +130,12 @@ class ValidationService implements ValidationServiceInterface
      */
     private function isSecure(string $field): bool
     {
-        if (empty($field)) {
+        if ($field === '') {
             return true;
         }
 
-        $pattern = "/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*\W)[^а-яёА-ЯЁ]{8,64}$/";
-        return preg_match($pattern, $field);
+        $pattern = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*\W)[^а-яёА-ЯЁ]{8,64}$";
+        return mb_ereg($pattern, $field);
     }
     
     /**
@@ -142,10 +147,6 @@ class ValidationService implements ValidationServiceInterface
      */
     private function isSame(string $field, string $other): bool
     {
-        if (empty($field) && empty($other)) {
-            return true;
-        }
-
         return $field === $other;
     }
 }

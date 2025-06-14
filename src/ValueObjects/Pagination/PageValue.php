@@ -21,9 +21,9 @@ readonly class PageValue
         if ($intPage <= 0 || $intPage === PHP_INT_MAX) {
             $this->value = Paginator::PAGINATOR_DEFAULT_CURRENT_PAGE;
             return ;
-        } else {
-            $this->value = $intPage;
         }
+        
+        $this->value = $intPage;
     }
     
     public static function create(string|null $page): self

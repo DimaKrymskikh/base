@@ -8,6 +8,7 @@ use Base\Server\ServerRequest;
 use Base\Services\ClockService;
 use Base\Services\FileService;
 use Base\Services\LoggerService;
+use Base\Session\ErrorsSession;
 use Base\Support\DB\DB;
 use Base\Support\DB\DBconnection;
 use Base\Support\Options;
@@ -25,6 +26,9 @@ final class Application
         $serverRequest = new ServerRequest();
         (new CsrfProtection($serverRequest))->check();
         $this->container->set('serverRequest', $serverRequest);
+        
+        // Сбрасываем сообщения об ошибках
+        ErrorsSession::getInstance()->destroy();
         
         $this->container->set('db', new DB( new DBconnection($config->db) ));
 
