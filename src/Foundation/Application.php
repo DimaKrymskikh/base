@@ -27,9 +27,6 @@ final class Application
         (new CsrfProtection($serverRequest))->check();
         $this->container->set('serverRequest', $serverRequest);
         
-        // Сбрасываем сообщения об ошибках
-        ErrorsSession::getInstance()->destroy();
-        
         $this->container->set('db', new DB( new DBconnection($config->db) ));
 
         $finishedConfig = (new Options($config))->config;

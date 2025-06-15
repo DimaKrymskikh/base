@@ -36,11 +36,11 @@ readonly class PasswordValue
         $this->value = count($errors) ? '' : $stringPassword;
         
         if (count($errorsPassword)) {
-            ErrorsSession::getInstance()->setErrorMessage('password', implode(' ', $errors));
+            ErrorsSession::getInstance()->setErrorMessage('password', implode(' ', $errorsPassword));
         }
         
         if (count($errorsVerification)) {
-            ErrorsSession::getInstance()->setErrorMessage('verification', implode(' ', $errors));
+            ErrorsSession::getInstance()->setErrorMessage('verification', implode(' ', $errorsVerification));
         }
     }
     
