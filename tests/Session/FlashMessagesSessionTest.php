@@ -1,25 +1,31 @@
 <?php
 
-use Base\Services\FlashMessages\FlashMessagesService;
+use Base\Session\FlashMessagesSession;
 use PHPUnit\Framework\TestCase;
 
-class FlashMessagesServiceTest extends TestCase
+class FlashMessagesSessionTest extends TestCase
 {
     private const FLASH_MESSAGE = 'flash_message';
 
-    private FlashMessagesService $flashMessages;
+    private FlashMessagesSession $flashMessages;
 
-    public function test_createFlashMessage_method_is_recording_in_session(): void
+    public function test_singleton(): void
     {
-        $this->flashMessages->createFlashMessage('name', 'message');
+        $flashMessages = FlashMessagesSession::getInstance();
+        $this->assertTrue($flashMessages === $this->flashMessages);
+    }
+
+    public function test_setFlashMessage_method_is_recording_in_session(): void
+    {
+        $this->flashMessages->setFlashMessage('name', 'message');
         
         $this->assertEquals('message', $_SESSION[self::FLASH_MESSAGE]['name']);
     }
 
-    public function test_createFlashMessage_method_rewrite_session(): void
+    public function test_setFlashMessage_method_rewrite_session(): void
     {
         $_SESSION[self::FLASH_MESSAGE]['name'] = 'Дима';
-        $this->flashMessages->createFlashMessage('name', 'message');
+        $this->flashMessages->setFlashMessage('name', 'message');
         
         $this->assertEquals('message', $_SESSION[self::FLASH_MESSAGE]['name']);
     }
@@ -51,7 +57,7 @@ class FlashMessagesServiceTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->flashMessages = FlashMessagesService::getInstance();
+        $this->flashMessages = FlashMessagesSession::getInstance();
     }
     
     protected function tearDown(): void

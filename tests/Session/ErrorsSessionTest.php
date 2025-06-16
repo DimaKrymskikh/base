@@ -24,25 +24,23 @@ class ErrorsSessionTest extends TestCase
         $this->errorsSession->setErrorMessage('one', 'errorOne');
         $this->errorsSession->setErrorMessage('two', 'errorTwo');
         
+        $this->assertFalse($this->errorsSession->isEmpty());
         $this->assertEqualsCanonicalizing([
             'one' => 'errorOne',
             'two' => 'errorTwo'
         ], $this->errorsSession->getErrors());
-        $this->assertFalse($this->errorsSession->isEmpty());
         
-        $this->errorsSession->destroy();
-        $this->assertEquals([], $this->errorsSession->getErrors());
         $this->assertTrue($this->errorsSession->isEmpty());
+        $this->assertEquals([], $this->errorsSession->getErrors());
     }
 
     protected function setUp(): void
     {
         $this->errorsSession = ErrorsSession::getInstance();
-        $this->errorsSession->destroy();
     }
     
     protected function tearDown(): void
     {
-        unset($_SESSION['errors']);
+        $this->errorsSession->destroy();
     }
 }

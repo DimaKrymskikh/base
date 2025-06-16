@@ -49,19 +49,20 @@ class LoginValueTest extends TestCase
     {
         $this->assertEquals($login, LoginValue::create($input)->value);
         
+        $loginErrors = $this->errorsSession->getErrors()['login'];
+        
         foreach ($expectedErrors as $error) {
-            $this->assertStringContainsString($error, $this->errorsSession->getErrors()['login']);
+            $this->assertStringContainsString($error, $loginErrors);
         }
     }
 
     protected function setUp(): void
     {
         $this->errorsSession = ErrorsSession::getInstance();
-        $this->errorsSession->destroy();
     }
     
     protected function tearDown(): void
     {
-        unset($_SESSION['errors']);
+        $this->errorsSession->destroy();
     }
 }

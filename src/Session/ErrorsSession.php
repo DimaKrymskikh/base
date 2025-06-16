@@ -8,7 +8,10 @@ final class ErrorsSession extends BaseSession
     
     public function getErrors(): array
     {
-        return $_SESSION['errors'];
+        $errors = $_SESSION['errors'] ?? [];
+        $this->destroy();
+        
+        return $errors;
     }
     
     public function setErrorMessage(string $key, string $message): void
@@ -18,11 +21,11 @@ final class ErrorsSession extends BaseSession
     
     public function destroy(): void
     {
-        $_SESSION['errors'] = [];
+        unset($_SESSION['errors']);
     }
     
     public function isEmpty(): bool
     {
-        return !count($_SESSION['errors']);
+        return !count($_SESSION['errors'] ?? []);
     }
 }

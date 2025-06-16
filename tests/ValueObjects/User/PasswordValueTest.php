@@ -55,8 +55,10 @@ class PasswordValueTest extends TestCase
     {
         $this->assertEquals('', PasswordValue::create($password, $verification)->value);
         
+        $passwordErrors = implode( $this->errorsSession->getErrors() );
+        
         foreach ($expectedErrors as $error) {
-            $this->assertStringContainsString($error, implode( $this->errorsSession->getErrors() ));
+            $this->assertStringContainsString($error, $passwordErrors);
         }
     }
 
