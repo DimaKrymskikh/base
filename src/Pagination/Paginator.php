@@ -35,9 +35,9 @@ final class Paginator implements PaginatorInterface
     /**
      * Задаёт параметры пагинации.
      * 
-     * @param PageValue $page
-     * @param PerPageValue $perPage
-     * @param int $total
+     * @param PageValue $page - номер текущей страницы, заданный в ссылке пагинации
+     * @param PerPageValue $perPage - число элементов на странице, заданное в ссылке пагинации
+     * @param int $total - общее число элементов в списке, должно быть вычислено перед применением метода
      * @return void
      */
     public function setOptions(PageValue $page, PerPageValue $perPage, int $total): void
@@ -45,8 +45,11 @@ final class Paginator implements PaginatorInterface
         $this->total = $total;
         $this->perPage = $perPage->value;
         $this->pagesNumber = (int) ceil($total / $perPage->value);
+        // При удалении элементов страниц может стать меньше, поэтому нужен min
         $this->currentPage = min($page->value, $this->pagesNumber);
-        $this->offset = ($this->currentPage - 1) * $perPage->value;
+        // При удалении элементов, например, удаляется единственный элемент, 
+        // offset может стать отрицательным, поэтому нужен max
+        $this->offset = max(self::PAGINATOR_DEFAULT_OFFSET, ($this->currentPage - 1) * $perPage->value);
     }
     
     public function getTotal(): int

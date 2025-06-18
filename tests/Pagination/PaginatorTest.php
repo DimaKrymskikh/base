@@ -59,6 +59,22 @@ class PaginatorTest extends TestCase
         $this->assertEquals(5, $paginator->getPagesNumber());
     }
     
+    public function test_setOptions_method_install_options_in_case_one_item_on_one_page(): void
+    {
+        $page = PageValue::create('1');
+        $perPage = PerPageValue::create('10');
+        $total = 0;
+        
+        $paginator = new Paginator((object) [], $this->serverRequest);
+        $paginator->setOptions($page, $perPage, $total);
+        
+        $this->assertEquals($page->value - 1, $paginator->getCurrentPage());
+        $this->assertEquals($perPage->value, $paginator->getPerPage());
+        $this->assertEquals($total, $paginator->getTotal());
+        $this->assertEquals(0, $paginator->getOffset());
+        $this->assertEquals(0, $paginator->getPagesNumber());
+    }
+    
     public function test_default_case(): void
     {
         $paginator = new Paginator((object) [], $this->serverRequest);
