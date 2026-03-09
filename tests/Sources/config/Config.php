@@ -12,7 +12,8 @@ class Config
     public static function getDefaultConfig(): object
     {
         return (object)[
-            'app_url' => 'test'
+            'app_url' => 'test',
+            'app_debug' => true,
         ];
     }
     

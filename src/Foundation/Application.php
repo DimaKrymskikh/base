@@ -8,7 +8,6 @@ use Base\Server\ServerRequest;
 use Base\Services\ClockService;
 use Base\Services\FileService;
 use Base\Services\LoggerService;
-use Base\Session\ErrorsSession;
 use Base\Support\DB\DB;
 use Base\Support\DB\DBconnection;
 use Base\Support\Options;
@@ -37,7 +36,7 @@ final class Application
         $loggerService = new LoggerService($finishedConfig->logs, new ClockService(), new FileService());
         $this->container->set('loggerService', $loggerService);
         
-        set_exception_handler([new HandleExceptions($loggerService), 'render']);
+        set_exception_handler([new ExceptionsHandler($loggerService, $config->app_debug), 'handle']);
     }
     
     public function getContainer(): Container

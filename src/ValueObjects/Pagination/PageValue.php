@@ -3,6 +3,7 @@
 namespace Base\ValueObjects\Pagination;
 
 use Base\Pagination\Paginator;
+use Base\Services\Validation\Rules\IntegerRule;
 
 /**
  * Хранит целое число, пригодное для задания страницы пагинации.
@@ -15,15 +16,14 @@ readonly class PageValue
     
     private function __construct(string|null $page)
     {
-        $intPage = intval($page);
+        $strPage = mb_trim($page ?? '');
         
-        // Номер страницы должен быть положительным
-        if ($intPage <= 0 || $intPage === PHP_INT_MAX) {
+        if (!IntegerRule::check($strPage, 1, PHP_INT_MAX)) {
             $this->value = Paginator::PAGINATOR_DEFAULT_CURRENT_PAGE;
             return ;
         }
         
-        $this->value = $intPage;
+        $this->value = (int) $strPage;
     }
     
     public static function create(string|null $page): self

@@ -1,6 +1,6 @@
 <?php
 
-use Base\Session\ErrorsSession;
+use Base\Exceptions\RuleException;
 use Base\ValueObjects\User\LoginValue;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -10,10 +10,8 @@ class LoginValueTest extends TestCase
     private const REQUIRED_MESSAGE = 'Логин не должен быть пустым.';
     private const ALPHANUMERIC_MESSAGE = 'Логин должен состоять из латинских букв и цифр.';
     private const BEETWEEN_MESSAGE = 'Логин должен состоять из 4 - 18 символов.';
-    
-    private ErrorsSession $errorsSession;
 
-    public static function correctLoginsProvider(): array
+    public static function successProvider(): array
     {
         // $login, $input
         return [
@@ -25,44 +23,30 @@ class LoginValueTest extends TestCase
         ];
     }
     
-    #[DataProvider('correctLoginsProvider')]
+    #[DataProvider('successProvider')]
     public function test_correct_logins(string $login, string $input): void
     {
         $this->assertEquals($login, LoginValue::create($input)->value);
-        $this->assertEquals([], $this->errorsSession->getErrors());
     }
     
-    public static function nonCorrectLoginsProvider(): array
+    public static function failProvider(): array
     {
-        // $login, $input, $expectedErrors
+        // $input, $expectedErrors
         return [
-            ['', null, [self::REQUIRED_MESSAGE]],
-            ['', '', [self::REQUIRED_MESSAGE]],
-            ['', ' ', [self::REQUIRED_MESSAGE]],
-            ['Bo$', 'Bo$', [self::BEETWEEN_MESSAGE, self::ALPHANUMERIC_MESSAGE]],
-            ['Boo0123456789abcdef', 'Boo0123456789abcdef', [self::BEETWEEN_MESSAGE]],
+            [null, [self::REQUIRED_MESSAGE]],
+            ['', [self::REQUIRED_MESSAGE]],
+            [' ', [self::REQUIRED_MESSAGE]],
+            ['Bo$', [self::ALPHANUMERIC_MESSAGE, self::BEETWEEN_MESSAGE]],
+            ['Boo0123456789abcdef', [self::BEETWEEN_MESSAGE]],
         ];
     }
     
-    #[DataProvider('nonCorrectLoginsProvider')]
-    public function test_noncorrect_logins(string $login, string|null $input, array $expectedErrors): void
+    #[DataProvider('failProvider')]
+    public function test_noncorrect_logins(string|null $input, array $expectedErrors): void
     {
-        $this->assertEquals($login, LoginValue::create($input)->value);
+        $this->expectException(RuleException::class);
+        $this->expectExceptionMessage(implode(' ', $expectedErrors));
         
-        $loginErrors = $this->errorsSession->getErrors()['login'];
-        
-        foreach ($expectedErrors as $error) {
-            $this->assertStringContainsString($error, $loginErrors);
-        }
-    }
-
-    protected function setUp(): void
-    {
-        $this->errorsSession = ErrorsSession::getInstance();
-    }
-    
-    protected function tearDown(): void
-    {
-        $this->errorsSession->destroy();
+        LoginValue::create($input);
     }
 }

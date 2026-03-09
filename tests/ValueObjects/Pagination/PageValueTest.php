@@ -7,22 +7,19 @@ use PHPUnit\Framework\TestCase;
 
 class PageValueTest extends TestCase
 {
-    public static function correctPagesProvider(): array
+    public static function successProvider(): array
     {
         return [
             [12, '12'],
             [15, ' 15 '],
-            // Строка начинается с последовательности цифр
-            [71, '71x'],
-            [7, "\t 7 x"],
-            [15, '15.25 '],
-            [20, '2e1'],
-            [25, '025'],
-            [250, '0250'],
             [25, '+25'],
-            [15, '15.77777777777777777777777777777777777777777777777777777'],
-            [15, '+15.77777777777777777777777777777777777777777777777777777'],
         ];
+    }
+    
+    #[DataProvider('successProvider')]
+    public function test_success_create(int $page, string $str): void
+    {
+        $this->assertEquals($page, PageValue::create($str)->value);
     }
     
     public static function inCorrectPagesProvider(): array
@@ -36,7 +33,6 @@ class PageValueTest extends TestCase
             ['+0'],
             ['-7'],
             ['-1.3'],
-            // Строка начинается с буквы
             ['x7'],
             ['aaa'],
             ['+a'],
@@ -45,12 +41,6 @@ class PageValueTest extends TestCase
             ['77777777777777777777777777777777777777777777777777777.1'],
             ['-15.77777777777777777777777777777777777777777777777777777'],
         ];
-    }
-    
-    #[DataProvider('correctPagesProvider')]
-    public function test_correct_pages(int $page, string $str): void
-    {
-        $this->assertEquals($page, PageValue::create($str)->value);
     }
     
     #[DataProvider('inCorrectPagesProvider')]

@@ -2,18 +2,25 @@
 
 namespace Base\Foundation;
 
-use Base\Services\LoggerService;
+use Base\Exceptions\HtmlExceptionInterface;
+use Psr\Log\LoggerInterface;
 
-final class HandleExceptions
+final class ExceptionsHandler
 {
     public function __construct(
-            private LoggerService $loggerService,
+            private LoggerInterface $loggerService,
+            private bool $appDebug,
     ) {
     }
     
-    public function render(\Throwable $e): void
+    public function handle(\Throwable $e): void
     {
-        if(APP_DEBUG) {
+        if($e instanceof HtmlExceptionInterface) {
+            $e->render();
+            return;
+        }
+        
+        if($this->appDebug) {
             echo $this->getHtmlMessage($e);
         } else {
             $this->loggerService->error($this->getLogMessage($e));

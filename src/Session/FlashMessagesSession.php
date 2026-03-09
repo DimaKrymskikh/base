@@ -21,6 +21,7 @@ final class FlashMessagesSession extends BaseSession
         return $flashMessage;
     }
     
+    #[\Override]
     public function destroy(): void
     {
         unset($_SESSION[self::FLASH_MESSAGE]);

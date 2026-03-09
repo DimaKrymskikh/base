@@ -16,6 +16,7 @@ class OptionsTest extends TestCase
     {
         $this->assertEqualsCanonicalizing((object) [
             'app_url' => 'test',
+            'app_debug' => true,
             'template' => DefaultConfig::Template->value,
             'views_folder' => DefaultConfig::ViewsFolder->value,
             'routes_file' => DefaultConfig::RoutesFile->value,
@@ -46,6 +47,7 @@ class OptionsTest extends TestCase
     {
         $this->assertEqualsCanonicalizing((object) [
             'app_url' => 'test',
+            'app_debug' => false,
             'template' => '/Views/Layout/template.php',
             'views_folder' => DefaultConfig::ViewsFolder->value,
             'routes_file' => '/../routes/routes.php',
@@ -76,6 +78,7 @@ class OptionsTest extends TestCase
     {
         $this->assertEqualsCanonicalizing((object) [
             'app_url' => 'test',
+            'app_debug' => false,
             'template' => DefaultConfig::Template->value,
             'views_folder' => '/Http/Views/',
             'routes_file' => DefaultConfig::RoutesFile->value,
@@ -116,6 +119,7 @@ class OptionsTest extends TestCase
     {
         $this->assertEqualsCanonicalizing((object) [
             'app_url' => 'test',
+            'app_debug' => false,
             'template' => DefaultConfig::Template->value,
             'views_folder' => DefaultConfig::ViewsFolder->value,
             'routes_file' => DefaultConfig::RoutesFile->value,

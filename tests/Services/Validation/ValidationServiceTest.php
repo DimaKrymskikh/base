@@ -1,306 +1,139 @@
 <?php
 
 use Base\Services\Validation\ValidationService;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class ValidationServiceTest extends TestCase
 {
     private const REQUIRED_MESSAGE = 'Величина не должна быть пустой.';
     private const EMAIL_MESSAGE = 'Адрес электронной почты "%s" считается не действительным.';
-    private const ALPHANUMERIC_MESSAGE = 'Величина должна состоять из латинских букв и цифр.';
-    private const BEETWEEN_MESSAGE = 'Величина должна состоять из 5 - 10 символов.';
-    private const SECURE_MESSAGE = 'Пароль должен состоять из 8 - 64 символов и содержать как минимум одну цифру, одну заглавную латинскую букву, одну строчную латинскую букву и один специальный символ.';
-    private const SAME_MESSAGE = 'Подтверждение не совпадает с паролем.';
-    private const NONEXISTENT_MESSAGE = 'Какое-то сообщение';
+    private const BEETWEEN_MESSAGE = 'Величина должна состоять из %2$s - %3$s символов.';
+    private const FAIL_MESSAGE = 'Какое-то сообщение';
 
-    public static function requiredRuleProvider(): array
+    public function test_success_validate_two_simple_rules(): void
     {
-        // $field, $expectedErrors
-        return [
-            ['', [self::REQUIRED_MESSAGE]],
-            ['aa', []],
+        $arrMessage = [
+            'required' => self::REQUIRED_MESSAGE,
+            'email' => self::EMAIL_MESSAGE
         ];
+        
+        $errors = (new ValidationService())->validate('aa@bb.x', 'required|email', $arrMessage);
+        $this->assertEquals([], $errors);
     }
     
-    #[DataProvider('requiredRuleProvider')]
-    public function test_check_required_rule(string $field, array $expectedErrors): void
+    public function test_success_validate_simple_and_complex_rules(): void
     {
-        $arrMessage = ['required' => self::REQUIRED_MESSAGE];
-        $rule = 'required';
-        
-        $errors = (new ValidationService())->validate($field, $rule, $arrMessage);
-        $this->assertEquals($expectedErrors, $errors);
-    }
-
-    public static function emailRuleProvider(): array
-    {
-        // $field, $expectedErrors
-        return [
-            // Ошибка не обнаружена, потому что задана пустая строка ''.
-            // Предполагается, что всегда используется связка required | email
-            ['', []],
-            [' ', [sprintf(self::EMAIL_MESSAGE, ' ')]],
-            ['aa', [sprintf(self::EMAIL_MESSAGE, 'aa')]],
-            ['aa@bb.x', []],
+        $arrMessage = [
+            'required' => self::REQUIRED_MESSAGE,
+            'between' => self::BEETWEEN_MESSAGE
         ];
-    }
-    
-    #[DataProvider('emailRuleProvider')]
-    public function test_check_email_rule(string $field, array $expectedErrors): void
-    {
-        $arrMessage = ['email' => self::EMAIL_MESSAGE];
-        $rule = 'email';
         
-        $errors = (new ValidationService())->validate($field, $rule, $arrMessage);
-        $this->assertEquals($expectedErrors, $errors);
+        $errors = (new ValidationService())->validate('aa@bb.x', 'between:5,10|required', $arrMessage);
+        $this->assertEquals([], $errors);
     }
 
-    public static function requiredAndEmailRuleProvider(): array
+    public function test_fail_validate_one_fail_rule_from_two_simple_rules(): void
     {
-        // $field, $expectedErrors
-        return [
-            ['', [self::REQUIRED_MESSAGE]],
-            [' ', [sprintf(self::EMAIL_MESSAGE, ' ')]],
-            ['aa', [sprintf(self::EMAIL_MESSAGE, 'aa')]],
-            ['aa@bb.x', []],
+        $email = 'aa';
+        $arrMessage = [
+            'required' => self::REQUIRED_MESSAGE,
+            'email' => self::EMAIL_MESSAGE
         ];
+        
+        $errors = (new ValidationService())->validate($email, 'required|email', $arrMessage);
+        $this->assertEquals([sprintf(self::EMAIL_MESSAGE, $email)], $errors);
     }
     
-    #[DataProvider('requiredAndEmailRuleProvider')]
-    public function test_check_required_and_email_rule(string $field, array $expectedErrors): void
+    public function test_fail_validate_two_fail_rules_from_two_simple_rules(): void
     {
-        $arrMessage = ['email' => self::EMAIL_MESSAGE, 'required' => self::REQUIRED_MESSAGE];
-        $rule = 'required | email';
+        $email = '';
+        $arrMessage = [
+            'required' => self::REQUIRED_MESSAGE,
+            'email' => self::EMAIL_MESSAGE
+        ];
         
-        $errors = (new ValidationService())->validate($field, $rule, $arrMessage);
-        $this->assertEquals($expectedErrors, $errors);
+        $errors = (new ValidationService())->validate($email, 'required|email', $arrMessage);
+        $this->assertEquals([
+            self::REQUIRED_MESSAGE,
+            sprintf(self::EMAIL_MESSAGE, $email)
+        ], $errors);
+    }
+    
+    public function test_fail_validate_one_fail_complex_rule_from_two_rules(): void
+    {
+        $field = 'abcd';
+        $arrMessage = [
+            'required' => self::REQUIRED_MESSAGE,
+            'between' => self::BEETWEEN_MESSAGE
+        ];
+        
+        $errors = (new ValidationService())->validate($field, 'required|between:5,10', $arrMessage);
+        $this->assertEquals([sprintf(self::BEETWEEN_MESSAGE, $field, '5', '10')], $errors);
+    }
+    
+    public function test_fail(): void
+    {
+        $field = '';
+        $arrMessage = [
+            'required' => self::REQUIRED_MESSAGE,
+            'between' => self::BEETWEEN_MESSAGE
+        ];
+        
+        $errors = (new ValidationService())->validate($field, 'between:5,10|required', $arrMessage);
+        $this->assertEqualsCanonicalizing([
+            self::REQUIRED_MESSAGE,
+            sprintf(self::BEETWEEN_MESSAGE, $field, '5', '10')
+        ], $errors);
+    }
+    
+/*****************************************************************************************************************************
+ * Серия тестов с исключениями.
+ *****************************************************************************************************************************/    
+    public function test_fail_validate_fail_rule(): void
+    {
+        $rule = $options = 'fail';
+        $arrMessage = [$rule => self::FAIL_MESSAGE];
+        
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage("Задано не существующее правило $rule");
+        
+        (new ValidationService())->validate('test', $options, $arrMessage);
     }
 
-    public static function alphanumericRuleProvider(): array
+    public function test_fail_validate_fail_rule_with_parameters(): void
     {
-        // $field, $expectedErrors
-        return [
-            // Ошибка не обнаружена, потому что задана пустая строка ''.
-            // Предполагается, что всегда используется связка required | alphanumeric
-            ['', []],
-            ['  ', [self::ALPHANUMERIC_MESSAGE]],
-            ['<a>', [self::ALPHANUMERIC_MESSAGE]],
-            ['aa', []],
+        $options = 'fail:7';
+        $arrMessage = [
+            'fail' => self::FAIL_MESSAGE,
         ];
-    }
-    
-    #[DataProvider('alphanumericRuleProvider')]
-    public function test_check_alphanumeric_rule(string $field, array $expectedErrors): void
-    {
-        $arrMessage = ['alphanumeric' => self::ALPHANUMERIC_MESSAGE];
-        $rule = 'alphanumeric';
         
-        $errors = (new ValidationService())->validate($field, $rule, $arrMessage);
-        $this->assertEquals($expectedErrors, $errors);
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage("Задано не существующее правило fail");
+        
+        (new ValidationService())->validate('test', $options, $arrMessage);
     }
 
-    public static function requiredAndAlphanumericRuleProvider(): array
+    public function test_fail_validate_fail_message(): void
     {
-        // $field, $expectedErrors
-        return [
-            ['', [self::REQUIRED_MESSAGE]],
-            ['<a>', [self::ALPHANUMERIC_MESSAGE]],
-            ['aa1', []],
+        $rule = $options = 'required';
+        $arrMessage = ['fail' => self::FAIL_MESSAGE];
+        
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage("Для правила $rule не задано сообщение");
+        
+        (new ValidationService())->validate('test', $options, $arrMessage);
+    }
+    
+    public function test_fail_validate_fail_message_with_parameters(): void
+    {
+        $options = 'between:5,10';
+        $arrMessage = [
+            'fail' => self::FAIL_MESSAGE,
         ];
-    }
-    
-    #[DataProvider('requiredAndAlphanumericRuleProvider')]
-    public function test_check_required_and_alphanumeric_rule(string $field, array $expectedErrors): void
-    {
-        $arrMessage = ['alphanumeric' => self::ALPHANUMERIC_MESSAGE, 'required' => self::REQUIRED_MESSAGE];
-        $rule = 'required | alphanumeric';
         
-        $errors = (new ValidationService())->validate($field, $rule, $arrMessage);
-        $this->assertEquals($expectedErrors, $errors);
-    }
-
-    public static function betweenRuleProvider(): array
-    {
-        // $field, $expectedErrors
-        return [
-            // Ошибка не обнаружена, потому что задана пустая строка ''.
-            // Предполагается, что всегда используется связка required | between: 5,10
-            ['', []],
-            // Меньше 5
-            ['<a>0', [self::BEETWEEN_MESSAGE]],
-            ['<a>01', []],
-            ['<a>0123456', []],
-            // Больше 10
-            ['<a>01234567', [self::BEETWEEN_MESSAGE]],
-        ];
-    }
-    
-    #[DataProvider('betweenRuleProvider')]
-    public function test_check_between_rule(string $field, array $expectedErrors): void
-    {
-        $arrMessage = ['between' => self::BEETWEEN_MESSAGE];
-        $rule = 'between: 5,10';
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage("Для правила between не задано сообщение");
         
-        $errors = (new ValidationService())->validate($field, $rule, $arrMessage);
-        $this->assertEquals($expectedErrors, $errors);
-    }
-
-    public static function requiredAndBetweenRuleProvider(): array
-    {
-        // $field, $expectedErrors
-        return [
-            ['', [self::REQUIRED_MESSAGE]],
-            // Меньше 5
-            ['<a>0', [self::BEETWEEN_MESSAGE]],
-            ['<a>01', []],
-            ['<a>0123456', []],
-            // Больше 10
-            ['<a>01234567', [self::BEETWEEN_MESSAGE]],
-        ];
-    }
-    
-    #[DataProvider('requiredAndBetweenRuleProvider')]
-    public function test_check_required_and_between_rule(string $field, array $expectedErrors): void
-    {
-        $arrMessage = ['between' => self::BEETWEEN_MESSAGE, 'required' => self::REQUIRED_MESSAGE];
-        $rule = 'between: 5,10|required';
-        
-        $errors = (new ValidationService())->validate($field, $rule, $arrMessage);
-        $this->assertEquals($expectedErrors, $errors);
-    }
-
-    public static function secureRuleProvider(): array
-    {
-        $long = '$fF'.'0123456789'.'0123456789'.'0123456789'.'0123456789'.'0123456789'.'0123456789'.'a#';
-        
-        // $field, $expectedErrors
-        return [
-            // Ошибка не обнаружена, потому что задана пустая строка ''.
-            // Предполагается, что всегда используется связка required | secure
-            ['', []],
-            ['  ', [self::SECURE_MESSAGE]],
-            // Нет цифры
-            ['$abcdefG', [self::SECURE_MESSAGE]],
-            // Нет заглавной латинской буквы
-            ['$f123456', [self::SECURE_MESSAGE]],
-            // Нет строчной латинской буквы
-            ['$F123456', [self::SECURE_MESSAGE]],
-            // Нет специального символа
-            ['fF123456', [self::SECURE_MESSAGE]],
-            // Присутствует кириллица
-            ['$fF1234Ы', [self::SECURE_MESSAGE]],
-            // Мало символов (всего 7)
-            ['$fF1234', [self::SECURE_MESSAGE]],
-            // Много символов (всего 65)
-            [$long, [self::SECURE_MESSAGE]],
-            // Правильная строка
-            ['$fF12345', []],
-        ];
-    }
-    
-    #[DataProvider('secureRuleProvider')]
-    public function test_check_secure_rule(string $field, array $expectedErrors): void
-    {
-        $arrMessage = ['secure' => self::SECURE_MESSAGE];
-        $rule = 'secure';
-        
-        $errors = (new ValidationService())->validate($field, $rule, $arrMessage);
-        $this->assertEquals($expectedErrors, $errors);
-    }
-
-    public static function sameRuleProvider(): array
-    {
-        // $field, $other, $expectedErrors
-        return [
-            // Ошибка не обнаружена, потому что пароль и подтверждение - пустые строки ''.
-            // Предполагается, что всегда используется связка required | same
-            ['', '', []],
-            // Возникает ошибка, потому что величина $field не изменяется, а разбиение правила сопровождается удалением пробелов по краям
-            // (сравниваются строки ' ' и '').
-            [' ', ' ', [self::SAME_MESSAGE]],
-            // (сравниваются строки '' и '').
-            ['', ' ', []],
-            [' ', '', [self::SAME_MESSAGE]],
-            ['1', '', [self::SAME_MESSAGE]],
-            ['', '2', [self::SAME_MESSAGE]],
-            ['1', '2', [self::SAME_MESSAGE]],
-            ['1', '1', []],
-        ];
-    }
-    
-    #[DataProvider('sameRuleProvider')]
-    public function test_check_same_rule(string $field, string $other, array $expectedErrors): void
-    {
-        $arrMessage = ['same' => self::SAME_MESSAGE];
-        $rule = 'same: %s';
-        
-        $errors = (new ValidationService())->validate($field, sprintf($rule, $other), $arrMessage);
-        $this->assertEquals($expectedErrors, $errors);
-    }
-
-    public static function sameAlphanumericRuleProvider(): array
-    {
-        // $field, $other, $expectedErrors
-        return [
-            ['test', 'test', []],
-            ['test', 'notest', [self::SAME_MESSAGE]],
-            ['test$', 'test$', [self::ALPHANUMERIC_MESSAGE]],
-            ['test$', 'test', [self::SAME_MESSAGE, self::ALPHANUMERIC_MESSAGE]],
-        ];
-    }
-    
-    #[DataProvider('sameAlphanumericRuleProvider')]
-    public function test_check_same_and_alphanumeric_rule(string $field, string $other, array $expectedErrors): void
-    {
-        $arrMessage = ['same' => self::SAME_MESSAGE, 'alphanumeric' => self::ALPHANUMERIC_MESSAGE];
-        $rule = 'same: %s|alphanumeric';
-        
-        $errors = (new ValidationService())->validate($field, sprintf($rule, $other), $arrMessage);
-        $this->assertEqualsCanonicalizing($expectedErrors, $errors);
-    }
-    
-    public static function nonexistentRuleProvider(): array
-    {
-        // $rule, $ruleName
-        return [
-            ['', ''],
-            ['nonexistent', 'nonexistent'],
-            ['nonexistent:value', 'nonexistent'],
-            ['nonexistent:n1,n2', 'nonexistent'],
-        ];
-    }
-    
-    #[DataProvider('nonexistentRuleProvider')]
-    public function test_nonexistent_rule(string $rule, string $ruleName): void
-    {
-        $arrMessage = ['nonexistent' => self::NONEXISTENT_MESSAGE];
-        
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage("Задано не существующее правило $ruleName");
-        
-        (new ValidationService())->validate('test', $rule, $arrMessage);
-    }
-    
-    public static function forRuleNoMessageProvider(): array
-    {
-        // $rule, $ruleName
-        return [
-            ['secure | required', 'secure'],
-            ['secure', 'secure'],
-            ['between: 5,10', 'between'],
-            ['same: x', 'same'],
-        ];
-    }
-    
-    #[DataProvider('forRuleNoMessageProvider')]
-    public function test_for_rule_no_message(string $rule, string $ruleName): void
-    {
-        $arrMessage = ['fail' => self::SECURE_MESSAGE, 'required' => self::REQUIRED_MESSAGE];
-        
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage("Для правила $ruleName не задано сообщение");
-        
-        (new ValidationService())->validate('test', $rule, $arrMessage);
+        (new ValidationService())->validate('test', $options, $arrMessage);
     }
 }

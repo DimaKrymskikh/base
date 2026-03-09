@@ -2,8 +2,8 @@
 
 namespace Base\ValueObjects\User;
 
+use Base\Exceptions\RuleException;
 use Base\Services\Validation\ValidationService;
-use Base\Session\ErrorsSession;
 
 readonly class EmailValue
 {
@@ -21,11 +21,11 @@ readonly class EmailValue
         $emailTrim = mb_trim($email ?? '');
         $errors = (new ValidationService())->validate($emailTrim, self::OPTIONS, self::RULE_MESSAGES);
         
-        $this->value = $emailTrim;
-        
         if (count($errors)) {
-            ErrorsSession::getInstance()->setErrorMessage('email', implode(' ', $errors));
+            throw new RuleException('email', implode(' ', $errors));
         }
+        
+        $this->value = $emailTrim;
     }
     
     public static function create(string|null $email): self

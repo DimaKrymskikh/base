@@ -2,7 +2,7 @@
 
 namespace Base\ValueObjects\User;
 
-use Base\Session\ErrorsSession;
+use Base\Exceptions\RuleException;
 use Base\Services\Validation\ValidationService;
 
 readonly class LoginValue
@@ -22,11 +22,11 @@ readonly class LoginValue
         $loginTrim = mb_trim($login ?? '');
         $errors = (new ValidationService())->validate($loginTrim, self::OPTIONS, self::RULE_MESSAGES);
         
-        $this->value = $loginTrim;
-        
         if (count($errors)) {
-            ErrorsSession::getInstance()->setErrorMessage('login', implode(' ', $errors));
+            throw new RuleException('login', implode(' ', $errors));
         }
+        
+        $this->value = $loginTrim;
     }
     
     public static function create(string|null $login): self

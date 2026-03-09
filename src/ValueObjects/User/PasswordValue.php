@@ -2,23 +2,18 @@
 
 namespace Base\ValueObjects\User;
 
-use Base\Session\ErrorsSession;
+use Base\Exceptions\RuleException;
 use Base\Services\Validation\ValidationService;
 
 readonly class PasswordValue
 {
     public string $value;
     
-    private const PASSWORD_OPTIONS = 'required | secure';
-    private const VERIFICATION_OPTIONS = 'required | same:%s';
+    private const PASSWORD_OPTIONS = 'required|secure|same:%s';
     
     private const PASSWORD_RULE_MESSAGES = [
         'required' => 'Пароль не должен быть пустым.',
-        'secure' => 'Пароль должен состоять из 8 - 64 символов и содержать как минимум одну цифру, одну заглавную латинскую букву, одну строчную латинскую букву и один специальный символ.'
-    ];
-    
-    private const VERIFICATION_RULE_MESSAGES = [
-        'required' => 'Подтверждение не должно быть пустым.',
+        'secure' => 'Пароль должен состоять из 8 - 64 символов и содержать как минимум одну цифру, одну заглавную латинскую букву, одну строчную латинскую букву и один специальный символ.',
         'same' => 'Подтверждение не совпадает с паролем.'
     ];
     
@@ -29,19 +24,13 @@ readonly class PasswordValue
         
         $validationService = new ValidationService();
         
-        $errorsPassword = $validationService->validate($stringPassword, self::PASSWORD_OPTIONS, self::PASSWORD_RULE_MESSAGES);
-        $errorsVerification = $validationService->validate($stringVerification, sprintf(self::VERIFICATION_OPTIONS, $stringPassword), self::VERIFICATION_RULE_MESSAGES);
-        $errors = array_merge($errorsPassword, $errorsVerification);
+        $errors = $validationService->validate($stringPassword,  sprintf(self::PASSWORD_OPTIONS, $stringVerification), self::PASSWORD_RULE_MESSAGES);
         
-        $this->value = count($errors) ? '' : $stringPassword;
-        
-        if (count($errorsPassword)) {
-            ErrorsSession::getInstance()->setErrorMessage('password', implode(' ', $errorsPassword));
+        if (count($errors)) {
+            throw new RuleException('password', implode(' ', $errors));
         }
         
-        if (count($errorsVerification)) {
-            ErrorsSession::getInstance()->setErrorMessage('verification', implode(' ', $errorsVerification));
-        }
+        $this->value = $stringPassword;
     }
     
     public static function create(string|null $password, string|null $verification): self

@@ -20,6 +20,7 @@ final class LoggerService extends AbstractLogger
         $this->fileService = $fileService;
     }
     
+    #[\Override]
     public function log($level, string|\Stringable $message, array $context = []): void
     {
         $file = $this->getLogFile($level).'-'.$this->now->format('Y-m-d').'.log';

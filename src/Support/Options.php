@@ -19,6 +19,7 @@ readonly class Options
         
         [
             $appConfig->app_url,
+            $appConfig->app_debug,
             $appConfig->template,
             $appConfig->views_folder,
             $appConfig->error_router,
@@ -44,6 +45,9 @@ readonly class Options
      */
     private function setMainOptions(object $config): array
     {
+        // Если параметр конфигурации 'app_debug' не задан, то считаем, что app_debug = false, 
+        // чтобы ошибки писались в логи.
+        $appDebug = $config->app_debug ?? false;
         $template = $config->template ?? DefaultConfig::Template->value;
         $viewsFolder = $config->views_folder ?? DefaultConfig::ViewsFolder->value;
         $routesFile = $config->routes_file ?? DefaultConfig::RoutesFile->value;
@@ -62,7 +66,7 @@ readonly class Options
                     'views_folder' => DefaultConfig::ViewsFolder->value,
                 ];
         
-        return [$config->app_url, $template, $viewsFolder, $errorRouter, $routesFile];
+        return [$config->app_url, $appDebug, $template, $viewsFolder, $errorRouter, $routesFile];
     }
     
     private function setLogsOptions(object $config): object

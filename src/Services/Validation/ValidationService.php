@@ -9,11 +9,12 @@ class ValidationService implements ValidationServiceInterface
      * Возвращает массив сообщений об ошибках.
      * Если ошибки не обнаружены, возвращается пустой массив.
      * 
-     * @param string $field - величина, которую нужно проверить.
-     * @param string $options - правила проверки, разделённые символом |. У правил могут быть параметры. Правило и параметры разделяются символом :. Параметры записываются через запятую.
-     * @param array $messages - массив сообщений об ошибках. Ключ - имя правила, значение - сообщение об ошибке.
-     * @return array
+     * @param string $field Величина, которую нужно проверить.
+     * @param string $options Правила проверки, разделённые символом |. У правил могут быть параметры. Правило и параметры разделяются символом :. Параметры записываются через запятую.
+     * @param array $messages Ассоциативный массив сообщений об ошибках. Ключ - имя правила, значение - сообщение об ошибке.
+     * @return array Простой массив сообщений об ошибках.
      */
+    #[\Override]
     public function validate(string $field, string $options, array $messages): array
     {
         $rules = $this->split($options, '|');
@@ -29,19 +30,15 @@ class ValidationService implements ValidationServiceInterface
                 $ruleName = $rule;
             }
             
-            $fn = 'is'.mb_ucfirst($ruleName);
-            
-            if(!method_exists($this, $fn)) {
-                throw new \Exception("Задано не существующее правило $ruleName");
-            }
-            
             if(!isset($messages[$ruleName])) {
-                throw new \Exception("Для правила $ruleName не задано сообщение");
+                throw new \LogicException("Для правила $ruleName не задано сообщение");
             }
             
-            $pass = $this->$fn($field, ...$params);
+            $className = $this->getClassName($ruleName);
+            
+            $pass = $className::check($field, ...$params);
             if (!$pass) {
-                $errors[] = sprintf($messages[$ruleName], $field);
+                $errors[] = sprintf($messages[$ruleName], $field, ...$params);
             }
         }
         
@@ -62,91 +59,19 @@ class ValidationService implements ValidationServiceInterface
     }
     
     /**
-     * Проверяет величину $field на соответствие правилу required.
+     * Для правила $ruleName возвращает класс валидации.
      * 
-     * @param string $field
-     * @return bool - true, если правило выполнено.
+     * @param string $ruleName
+     * @return string
+     * @throws \LogicException
      */
-    private function isRequired(string $field): bool
+    private function getClassName(string $ruleName): string
     {
-        return $field !== '';
-    }
-    
-    /**
-     * Проверяет величину $field на соответствие правилу email.
-     * 
-     * @param string $field
-     * @return bool - true, если правило выполнено.
-     */
-    private function isEmail(string $field): bool
-    {
-        if ($field === '') {
-            return true;
+        $className = '\Base\Services\Validation\Rules\\'.$ruleName.'Rule';
+        if(!class_exists($className)) {
+            throw new \LogicException("Задано не существующее правило $ruleName");
         }
-
-        return filter_var($field, FILTER_VALIDATE_EMAIL);
-    }
-    
-    /**
-     * Проверяет величину $field на соответствие правилу alphanumeric.
-     * 
-     * @param string $field
-     * @return bool - true, если правило выполнено.
-     */
-    private function isAlphanumeric(string $field): bool
-    {
-        if ($field === '') {
-            return true;
-        }
-
-        return ctype_alnum($field);
-    }
-    
-    /**
-     * Проверяет величину $field на соответствие правилу between: min, max.
-     * 
-     * @param string $field
-     * @param int $min
-     * @param int $max
-     * @return bool - true, если правило выполнено.
-     */
-    private function isBetween(string $field, int $min, int $max): bool
-    {
-        if ($field === '') {
-            return true;
-        }
-
-        $len = mb_strlen($field);
-        return $len >= $min && $len <= $max;
-    }
-    
-    /**
-     * Проверяет величину $field на соответствие правилу secure.
-     * (Величина $field должна состоять из 8 - 64 символов и содержать как минимум одну цифру, одну заглавную латинскую букву,
-     * одну строчную латинскую букву и один специальный символ без кириллицы.)
-     * 
-     * @param string $field
-     * @return bool - true, если правило выполнено.
-     */
-    private function isSecure(string $field): bool
-    {
-        if ($field === '') {
-            return true;
-        }
-
-        $pattern = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*\W)[^а-яёА-ЯЁ]{8,64}$";
-        return mb_ereg($pattern, $field);
-    }
-    
-    /**
-     * Проверяет величину $field на соответствие правилу same: other.
-     * 
-     * @param string $field
-     * @param string $other
-     * @return bool - true, если правило выполнено.
-     */
-    private function isSame(string $field, string $other): bool
-    {
-        return $field === $other;
+        
+        return $className;
     }
 }
