@@ -2,6 +2,7 @@
 
 namespace Base\Exceptions;
 
+use Base\Server\ServerRequestInterface;
 use Base\Session\ErrorsSession;
 
 /**
@@ -27,8 +28,9 @@ final class RuleException extends \Exception implements HtmlExceptionInterface
      * {@inheritDoc}
      */
     #[\Override]
-    public function render(): void
+    public function render(ServerRequestInterface $request): void
     {
         ErrorsSession::getInstance()->setErrorMessage($this->attribute, $this->exceptionMessage);
+        $request->back();
     }
 }

@@ -9,4 +9,11 @@ interface ServerRequestInterface
     public function getUri(): string;
     
     public function getProtocol(): string;
+    
+    /**
+     * Редирект на исходную страницу.
+     * 
+     * @return void
+     */
+    public function back(): void;
 }

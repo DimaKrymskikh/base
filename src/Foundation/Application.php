@@ -36,7 +36,7 @@ final class Application
         $loggerService = new LoggerService($finishedConfig->logs, new ClockService(), new FileService());
         $this->container->set('loggerService', $loggerService);
         
-        set_exception_handler([new ExceptionsHandler($loggerService, $config->app_debug), 'handle']);
+        set_exception_handler([new ExceptionsHandler($loggerService, $serverRequest, $config->app_debug), 'handle']);
     }
     
     public function getContainer(): Container

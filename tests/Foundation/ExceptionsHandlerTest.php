@@ -2,6 +2,7 @@
 
 use Base\Exceptions\RuleException;
 use Base\Foundation\ExceptionsHandler;
+use Base\Server\ServerRequestInterface;
 use Base\Session\ErrorsSession;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -11,10 +12,11 @@ class ExceptionsHandlerTest extends TestCase
     private ExceptionsHandler $handler;
     private LoggerInterface $loggerService;
     private ErrorsSession $errors;
+    private ServerRequestInterface $request;
 
     public function test_success_handle_for_html_exception(): void
     {
-        $this->handler = new ExceptionsHandler($this->loggerService, false);
+        $this->handler = new ExceptionsHandler($this->loggerService, $this->request, false);
         
         $e = new RuleException('attr', 'Некоторое сообщение');
         $this->handler->handle($e);
@@ -24,7 +26,7 @@ class ExceptionsHandlerTest extends TestCase
     
     public function test_success_handle_app_debug_true(): void
     {
-        $this->handler = new ExceptionsHandler($this->loggerService, true);
+        $this->handler = new ExceptionsHandler($this->loggerService, $this->request, true);
         
         $e = new \Exception('Некоторое сообщение');
         
@@ -40,7 +42,7 @@ class ExceptionsHandlerTest extends TestCase
     
     public function test_success_handle_app_debug_false(): void
     {
-        $this->handler = new ExceptionsHandler($this->loggerService, false);
+        $this->handler = new ExceptionsHandler($this->loggerService, $this->request, false);
         
         $e = new \Exception('Некоторое сообщение');
         
@@ -57,6 +59,7 @@ class ExceptionsHandlerTest extends TestCase
     {
         $this->errors = ErrorsSession::getInstance();
         $this->loggerService = $this->createMock(LoggerInterface::class);
+        $this->request = $this->createMock(ServerRequestInterface::class);
     }
     
     #[\Override]

@@ -3,12 +3,14 @@
 namespace Base\Foundation;
 
 use Base\Exceptions\HtmlExceptionInterface;
+use Base\Server\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 
 final class ExceptionsHandler
 {
     public function __construct(
             private LoggerInterface $loggerService,
+            private ServerRequestInterface $request,
             private bool $appDebug,
     ) {
     }
@@ -16,7 +18,7 @@ final class ExceptionsHandler
     public function handle(\Throwable $e): void
     {
         if($e instanceof HtmlExceptionInterface) {
-            $e->render();
+            $e->render($this->request);
             return;
         }
         

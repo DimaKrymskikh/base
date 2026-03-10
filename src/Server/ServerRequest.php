@@ -9,37 +9,53 @@ final class ServerRequest implements FilterRequestInterface, ServerRequestInterf
     private string $method;
     private string $uri;
     private string $protocol;
+    private string $host;
 
     public function __construct()
     {
         $this->method = strtoupper(filter_input(INPUT_SERVER, 'REQUEST_METHOD'));
-        $this->uri = trim(parse_url(filter_input(INPUT_SERVER, 'REQUEST_URI'), PHP_URL_PATH), '/');
+        $this->uri = mb_trim(parse_url(filter_input(INPUT_SERVER, 'REQUEST_URI'), PHP_URL_PATH), '/');
         $this->protocol = filter_input(INPUT_SERVER, 'SERVER_PROTOCOL');
+        $this->host = filter_input(INPUT_SERVER, 'HTTP_HOST');
     }
     
+    #[\Override]
     public function getMethod(): string
     {
         return $this->method;
     }
     
+    #[\Override]
     public function getUri(): string
     {
         return $this->uri;
     }
     
+    #[\Override]
     public function getProtocol(): string
     {
         return $this->protocol;
     }
     
+    #[\Override]
     public function filterInputGet(string $name): string
     {
         return filter_input(INPUT_GET, $name) ?: '';
     }
 
+    #[\Override]
     public function filterInputPost(string $name): string
     {
         return filter_input(INPUT_POST, $name) ?: '';
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    #[\Override]
+    public function back(): void
+    {
+        header('Location: http://'.$this->host.'/'.$this->uri, true, 303);
     }
     
     public function getGlobalArraysAsString(): string

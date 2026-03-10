@@ -2,12 +2,15 @@
 
 namespace Base\Exceptions;
 
+use Base\Server\ServerRequestInterface;
+
 interface HtmlExceptionInterface
 {
     /**
-     * Служит для записи сообщений об ошибках в сессию, чтобы затем отрисовать их на html-странице.
+     * Записывает сообщения об ошибках в сессию и делает редирект на исходную html-страницу.
      * 
+     * @param ServerRequestInterface $request
      * @return void
      */
-    public function render(): void;
+    public function render(ServerRequestInterface $request): void;
 }
