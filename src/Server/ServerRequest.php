@@ -10,6 +10,7 @@ final class ServerRequest implements FilterRequestInterface, ServerRequestInterf
     private string $uri;
     private string $protocol;
     private string $host;
+    private string $httpRefere;
 
     public function __construct()
     {
@@ -17,6 +18,7 @@ final class ServerRequest implements FilterRequestInterface, ServerRequestInterf
         $this->uri = mb_trim(parse_url(filter_input(INPUT_SERVER, 'REQUEST_URI'), PHP_URL_PATH), '/');
         $this->protocol = filter_input(INPUT_SERVER, 'SERVER_PROTOCOL');
         $this->host = filter_input(INPUT_SERVER, 'HTTP_HOST');
+        $this->httpRefere = filter_input(INPUT_SERVER, 'HTTP_REFERER');
     }
     
     #[\Override]
@@ -55,7 +57,7 @@ final class ServerRequest implements FilterRequestInterface, ServerRequestInterf
     #[\Override]
     public function back(): void
     {
-        header('Location: http://'.$this->host.'/'.$this->uri, true, 303);
+        header('Location: '.$this->httpRefere, true, 303);
     }
     
     public function getGlobalArraysAsString(): string
