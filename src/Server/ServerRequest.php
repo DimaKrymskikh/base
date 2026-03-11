@@ -18,7 +18,7 @@ final class ServerRequest implements FilterRequestInterface, ServerRequestInterf
         $this->uri = mb_trim(parse_url(filter_input(INPUT_SERVER, 'REQUEST_URI'), PHP_URL_PATH), '/');
         $this->protocol = filter_input(INPUT_SERVER, 'SERVER_PROTOCOL');
         $this->host = filter_input(INPUT_SERVER, 'HTTP_HOST');
-        $this->httpRefere = filter_input(INPUT_SERVER, 'HTTP_REFERER');
+        $this->httpRefere = filter_input(INPUT_SERVER, 'HTTP_REFERER') ?? '';
     }
     
     #[\Override]
