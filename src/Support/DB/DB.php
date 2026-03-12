@@ -2,7 +2,7 @@
 
 namespace Base\Support\DB;
 
-class DB
+final class DB
 {
     public const ERR_MESSAGE_MULTIPLE_FIELDS = "В запросе извлекается несколько полей";
     public const ERR_MESSAGE_MULTIPLE_LINES = "Запрос извлекает более одной строки";
@@ -15,7 +15,8 @@ class DB
     }
 
     /**
-     * Применяется при выполнении запросов INSERT или UPDATE без извлечения данных из базы
+     * Применяется при выполнении запросов INSERT, UPDATE или DELETE без извлечения данных из базы.
+     * 
      * @param string $sql
      * @param array $param
      * @return void
@@ -28,7 +29,8 @@ class DB
 
     /**
      * Из базы данных извлекается одно поле.
-     * Нужно следить за тем, чтобы запрос $sql возвращал одно поле и одну строку
+     * Нужно следить за тем, чтобы запрос $sql возвращал одно поле и одну строку.
+     * 
      * @param string $sql - строка запроса
      * @param array $params - параметры запроса
      * @return string
@@ -55,7 +57,8 @@ class DB
     }
 
     /**
-     * Из базы данных извлекается одна строка в виде объекта
+     * Из базы данных извлекается одна строка в виде std-объекта.
+     * 
      * @param string $sql
      * @param array $param
      * @return object
@@ -69,7 +72,8 @@ class DB
     }
 
     /**
-     * Из базы данных извлекается несколько строк в виде массива объектов
+     * Из базы данных извлекается несколько строк в виде массива std-объектов.
+     * 
      * @param string $sql
      * @param array $param
      * @return array
@@ -79,5 +83,45 @@ class DB
         $sth = $this->dbh->prepare($sql);
         $sth->execute($param);
         return $sth->fetchAll(\PDO::FETCH_OBJ) ?: [];
+    }
+    
+    /**
+     * Инициализация транзакции.
+     * 
+     * @return bool true, если выполнилась успешно, или false, если возникла ошибка.
+     */
+    public function beginTransaction(): bool
+    {
+        return $this->dbh->beginTransaction();
+    }
+    
+    /**
+     * Фиксирует транзакцию.
+     * 
+     * @return bool true, если выполнилась успешно, или false, если возникла ошибка.
+     */
+    public function commit(): bool
+    {
+        return $this->dbh->commit();
+    }
+    
+    /**
+     * Откат транзакции.
+     * 
+     * @return bool true, если выполнилась успешно, или false, если возникла ошибка.
+     */
+    public function rollBack(): bool
+    {
+        return $this->dbh->rollBack();
+    }
+    
+    /**
+     * Проверяет, начата ли транзакция
+     * 
+     * @return bool true, если транзакция в данный момент активна и false, если нет.
+     */
+    public function inTransaction(): bool
+    {
+        return $this->dbh->inTransaction();
     }
 }

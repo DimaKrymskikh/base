@@ -26,7 +26,8 @@ final class Application
         (new CsrfProtection($serverRequest))->check();
         $this->container->set('serverRequest', $serverRequest);
         
-        $this->container->set('db', new DB( new DBconnection($config->db) ));
+        $db = new DB(new DBconnection($config->db));
+        $this->container->set('db', $db);
 
         $finishedConfig = (new Options($config))->config;
         $this->container->set('config', $finishedConfig);
@@ -36,7 +37,7 @@ final class Application
         $loggerService = new LoggerService($finishedConfig->logs, new ClockService(), new FileService());
         $this->container->set('loggerService', $loggerService);
         
-        set_exception_handler([new ExceptionsHandler($loggerService, $serverRequest, $config->app_debug), 'handle']);
+        set_exception_handler([new ExceptionsHandler($loggerService, $serverRequest, $db, $config->app_debug), 'handle']);
     }
     
     public function getContainer(): Container

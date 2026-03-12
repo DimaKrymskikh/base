@@ -2,7 +2,7 @@
 
 namespace Base\Support\DB;
 
-readonly class DBconnection
+final readonly class DBconnection
 {
     public \PDO $dbh;
 

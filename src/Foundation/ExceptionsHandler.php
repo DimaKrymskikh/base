@@ -4,6 +4,7 @@ namespace Base\Foundation;
 
 use Base\Exceptions\HtmlExceptionInterface;
 use Base\Server\ServerRequestInterface;
+use Base\Support\DB\DB;
 use Psr\Log\LoggerInterface;
 
 final class ExceptionsHandler
@@ -11,12 +12,17 @@ final class ExceptionsHandler
     public function __construct(
             private LoggerInterface $loggerService,
             private ServerRequestInterface $request,
+            private DB $db,
             private bool $appDebug,
     ) {
     }
     
     public function handle(\Throwable $e): void
     {
+        if($this->db->inTransaction()) {
+            $this->db->rollBack();
+        }
+        
         if($e instanceof HtmlExceptionInterface) {
             $e->render($this->request);
             return;
