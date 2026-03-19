@@ -2,11 +2,13 @@
 
 namespace Base\Pagination;
 
-use Base\Server\ServerRequestInterface;
 use Base\ValueObjects\Pagination\PageValue;
 use Base\ValueObjects\Pagination\PerPageValue;
 
-final class Paginator implements PaginatorInterface
+/**
+ * Класс управляющий пагинацией.
+ */
+final class Paginator
 {
     public const PAGINATOR_DEFAULT_PER_PAGE = 20;
     public const PAGINATOR_DEFAULT_CURRENT_PAGE = 1;
@@ -26,18 +28,12 @@ final class Paginator implements PaginatorInterface
     // Сдвиг до первого элемента текущей страницы.
     private int $offset;
 
-    public function __construct(
-        private object $config,
-        private ServerRequestInterface $serverRequest
-    ) {
-    }
-    
     /**
      * Задаёт параметры пагинации.
      * 
-     * @param PageValue $page - номер текущей страницы, заданный в ссылке пагинации
-     * @param PerPageValue $perPage - число элементов на странице, заданное в ссылке пагинации
-     * @param int $total - общее число элементов в списке, должно быть вычислено перед применением метода
+     * @param PageValue $page Номер текущей страницы, заданный в ссылке пагинации.
+     * @param PerPageValue $perPage Число элементов на странице, заданное в ссылке пагинации.
+     * @param int $total Общее число элементов в списке, должно быть вычислено перед применением метода.
      * @return void
      */
     public function setOptions(PageValue $page, PerPageValue $perPage, int $total): void
@@ -75,49 +71,5 @@ final class Paginator implements PaginatorInterface
     public function getOffset(): int
     {
         return $this->offset ?? self::PAGINATOR_DEFAULT_OFFSET;
-    }
-    
-    /**
-     * Отрисовывает ссылку или текст, например, в ряде кнопок пагинации.
-     * 
-     * @param int $page - страница пагинации.
-     * @param int $perPage - число элементов на странице.
-     * @param array $fields - дополнительные поля запроса, например, фильтры по названию и описанию фильма
-     * @param bool $isCurrentPage - если true, то возвращается текст, иначе - ссылка. (В ряде кнопок пагинации для текущей страницы задаётся текст.)
-     * @param string $char - текст ссылки. Если $char = null, отрисовывается номер страницы.
-     * @return string
-     */
-    public function link(int $page, int $perPage, array $fields = [], bool $isCurrentPage = false, string|null $char = null): string
-    {
-        $letter = $char ?? $page;
-        
-        $uri = "/{$this->serverRequest->getUri()}?page=$page&per_page=$perPage";
-        
-        foreach ($fields as $name => $value) {
-            $uri .= "&$name=$value";
-        }
-        
-        return $isCurrentPage ?
-                <<<HTML
-                    <span> $letter </span>
-                HTML
-                :
-                <<<HTML
-                    <a href="$uri"> $letter </a>
-                HTML;
-    }
-    
-    /**
-     * Отрисовывает ряд кнопок пагинации.
-     * 
-     * @param array $fields - дополнительные поля запроса
-     * @return string
-     */
-    public function links(array $fields = []): string
-    {
-        ob_start();
-        extract($fields, EXTR_OVERWRITE);
-        require_once $this->config->app_url.$this->config->pagination->view;
-        return ob_get_clean();
     }
 }

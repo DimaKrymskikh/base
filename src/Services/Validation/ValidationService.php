@@ -2,7 +2,7 @@
 
 namespace Base\Services\Validation;
 
-class ValidationService implements ValidationServiceInterface
+final class ValidationService
 {
     /**
      * Проверяет, что величина $field удовлетворяет правилам $options.
@@ -14,7 +14,6 @@ class ValidationService implements ValidationServiceInterface
      * @param array $messages Ассоциативный массив сообщений об ошибках. Ключ - имя правила, значение - сообщение об ошибке.
      * @return array Простой массив сообщений об ошибках.
      */
-    #[\Override]
     public function validate(string $field, string $options, array $messages): array
     {
         $rules = $this->split($options, '|');
