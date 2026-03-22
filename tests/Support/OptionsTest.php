@@ -27,7 +27,7 @@ class OptionsTest extends TestCase
                 'views_folder' => DefaultConfig::ViewsFolder->value,
             ],
             'pagination' => (object) [
-                'view' => DefaultConfig::PaginationView->value
+                'folder' => DefaultConfig::PaginationFolder->value
             ],
             'modules' => [],
             'logs' => (object) [
@@ -58,7 +58,7 @@ class OptionsTest extends TestCase
                 'views_folder' => DefaultConfig::ViewsFolder->value,
             ],
             'pagination' => (object) [
-                'view' => DefaultConfig::PaginationView->value
+                'folder' => DefaultConfig::PaginationFolder->value
             ],
             'modules' => [],
             'logs' => (object) [
@@ -89,7 +89,7 @@ class OptionsTest extends TestCase
                 'views_folder' => '/Http/Views/error/'
             ],
             'pagination' => (object) [
-                'view' => DefaultConfig::PaginationView->value
+                'folder' => DefaultConfig::PaginationFolder->value
             ],
             'modules' => [
                 'module_one' => (object) [
@@ -130,7 +130,7 @@ class OptionsTest extends TestCase
                 'views_folder' => DefaultConfig::ViewsFolder->value,
             ],
             'pagination' => (object) [
-                'view' => DefaultConfig::PaginationView->value
+                'folder' => DefaultConfig::PaginationFolder->value
             ],
             'modules' => [],
             'logs' => (object) [

@@ -86,7 +86,7 @@ readonly class Options
     private function setPaginationOptions(object $config): object
     {
         return (object) [
-            'view' => $config->pagination?->view ?? DefaultConfig::PaginationView->value
+            'folder' => $config->pagination?->folder ?? DefaultConfig::PaginationFolder->value
         ];
     }
 }
