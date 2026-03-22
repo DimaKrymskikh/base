@@ -2,21 +2,16 @@
 
 namespace Base\Services;
 
-use Psr\Container\ContainerInterface;
-
 /**
  * Класс для внедрения зависимостей в контроллере и его экшенах.
  */
 final class ArgumentsService
 {
-    readonly ContainerInterface $container;
     private array $ctrlArgs;
     private array $actionArgs;
 
-    public function __construct(ContainerInterface $container, string $controller, string $action)
+    public function __construct(string $controller, string $action)
     {
-        $this->container = $container;
-        
         $this->execute($controller, $action);
     }
     

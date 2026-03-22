@@ -194,11 +194,10 @@ class RouterTest extends TestCase
         $serverRequest->method('getMethod')->willReturn($method);
         $serverRequest->method('getUri')->willReturn($uri);
         
-        $this->container = new Container();
         $this->container->set('config', $config);
         $this->container->set('requestModule', (new RequestModule($config, $serverRequest))->request);
 
-        $this->router = new Router($this->container);
+        $this->router = new Router();
 
         $this->router->get('/', FooController::class, 'index');
         $this->router->get('foo', FooController::class, 'index');
@@ -214,5 +213,17 @@ class RouterTest extends TestCase
         $this->router->delete('bar/{a}/{b}/str2/str3', BarController::class, 'delete');
         
         $this->router->setAction();
+    }
+
+    #[\Override]
+    protected function setUp(): void
+    {
+        $this->container = Container::getInstance();
+    }
+    
+    #[\Override]
+    protected function tearDown(): void
+    {
+        $this->container->flush();
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Base\Support;
 
+use Base\Container\Container;
 use Base\Server\FilterRequestInterface;
 use Base\Server\ServerRequestInterface;
 use Base\Services\ArgumentsService;
@@ -20,9 +21,11 @@ abstract class Parameters
         private ArgumentsService $service,
         private string $action,
     ) {
-        $this->db = $service->container->get('db');
-        $this->config = $service->container->get('config');
-        $this->serverRequest = $service->container->get('serverRequest');
+        $container = Container::getInstance();
+        
+        $this->db = $container->get('db');
+        $this->config = $container->get('config');
+        $this->serverRequest = $container->get('serverRequest');
         
         $this->service->setCtrlArgs($this->getCtrlArgs());
         $this->service->setActionArgs($this->getActionArgs($this->action));

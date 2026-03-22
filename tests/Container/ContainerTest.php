@@ -10,17 +10,11 @@ class ContainerTest extends TestCase
     private Container $container;
     private object $ob;
     private array $arr;
-
-    protected function setUp(): void
+    
+    public function test_singleton(): void
     {
-        $this->container = new Container();
-        
-        $this->ob = (object) [
-            'key1' => 'a',
-            'key2' => 7
-        ];
-        
-        $this->arr = ['a', 'b', 'c'];
+        $container = Container::getInstance();
+        $this->assertTrue($container === $this->container);
     }
 
     public function test_checking_the_set_method(): void
@@ -94,5 +88,24 @@ class ContainerTest extends TestCase
         $this->container->set('array', $this->arr);
         
         $this->assertEquals($this->arr, $this->container->get('class'));
+    }
+
+    #[\Override]
+    protected function setUp(): void
+    {
+        $this->container = Container::getInstance();
+        
+        $this->ob = (object) [
+            'key1' => 'a',
+            'key2' => 7
+        ];
+        
+        $this->arr = ['a', 'b', 'c'];
+    }
+    
+    #[\Override]
+    protected function tearDown(): void
+    {
+        $this->container->flush();
     }
 }

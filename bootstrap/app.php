@@ -30,5 +30,3 @@ if(!isset($config->app_url)) {
 $app = new Application($config);
 
 $app->withAssetsLogs();
-
-return $app->getContainer();

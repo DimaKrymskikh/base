@@ -20,7 +20,7 @@ final class Application
 
     public function __construct(object $config)
     {
-        $this->container = new Container();
+        $this->container = Container::getInstance();
         
         $serverRequest = new ServerRequest();
         (new CsrfProtection($serverRequest))->check();
@@ -37,12 +37,7 @@ final class Application
         $loggerService = new LoggerService($finishedConfig->logs, new ClockService(), new FileService());
         $this->container->set('loggerService', $loggerService);
         
-        set_exception_handler([new ExceptionsHandler($loggerService, $serverRequest, $db, $config->app_debug), 'handle']);
-    }
-    
-    public function getContainer(): Container
-    {
-        return $this->container;
+        set_exception_handler([new ExceptionsHandler($loggerService, $serverRequest, $db), 'handle']);
     }
     
     public function withAssetsLogs(): void

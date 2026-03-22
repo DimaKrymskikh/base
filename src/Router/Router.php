@@ -7,11 +7,11 @@ use Base\Container\Container;
 final class Router
 {
     private array $routers = [];
+    private Container $container;
 
-    public function __construct(
-        private Container $container
-    ) {
-        //
+    public function __construct()
+    {
+        $this->container = Container::getInstance();
     }
 
     /**
@@ -26,7 +26,7 @@ final class Router
         
         $appUri = $config->app_url;
         
-        $requestUri = explode('/', trim($requestModule->uri, '/'));
+        $requestUri = explode('/', mb_trim($requestModule->uri, '/'));
         
         // Перебираем все возможные маршруты до первого найденного
         foreach ($this->routers as $router) {

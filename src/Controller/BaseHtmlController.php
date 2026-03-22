@@ -2,9 +2,9 @@
 
 namespace Base\Controller;
 
+use Base\Container\Container;
 use Base\Session\ErrorsSession;
 use Base\Session\FlashMessagesSession;
-use Base\Router\ActionOptions;
 
 class BaseHtmlController extends HtmlController
 {
@@ -19,10 +19,13 @@ class BaseHtmlController extends HtmlController
     // Флэш-сообщения
     protected FlashMessagesSession $flashMessages;
 
-    public function __construct(ActionOptions $action)
+    public function __construct()
     {
+        $action = Container::getInstance()->get('action');
+        
         $this->template = $action->template;
         $this->viewsFolder = $action->viewsFolder;
+        
         $this->flashMessages = FlashMessagesSession::getInstance();
     }
 

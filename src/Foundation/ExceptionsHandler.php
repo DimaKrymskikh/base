@@ -13,7 +13,6 @@ final class ExceptionsHandler
             private LoggerInterface $loggerService,
             private ServerRequestInterface $request,
             private DB $db,
-            private bool $appDebug,
     ) {
     }
     
@@ -28,7 +27,7 @@ final class ExceptionsHandler
             return;
         }
         
-        if($this->appDebug) {
+        if(config('app_debug')) {
             echo $this->getHtmlMessage($e);
         } else {
             $this->loggerService->error($this->getLogMessage($e));

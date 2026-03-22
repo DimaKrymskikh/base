@@ -2,7 +2,9 @@
 
 namespace Tests\Pagination;
 
+use Base\Container\Container;
 use Base\Pagination\PaginationViews;
+use Base\Pagination\Paginator;
 use Base\ValueObjects\Pagination\PageValue;
 use Base\ValueObjects\Pagination\PerPageValue;
 use PHPUnit\Framework\TestCase;
@@ -30,21 +32,32 @@ class PaginationViewsTest extends TestCase
     public function test_success_span(): void
     {
         $page = 1;
-        $link = $this->paginationViews->span($page);
+        $span = $this->paginationViews->span($page);
         
-        $this->assertEquals("<span> $page </span>", trim($link));
+        $this->assertEquals("<span> $page </span>", trim($span));
     }
 
     public function test_success_links(): void
     {
-        $this->paginationViews->setOptions(PageValue::create(1), PerPageValue::create(10), 25);
+        $container = Container::getInstance();
+        $container->set('config', (object) [
+            'app_url' => __DIR__,
+            'pagination' => (object) [
+                'folder' => '/../../recources/Views/Pagination/',
+            ],
+        ]);
         
-        $this->assertIsString($this->paginationViews->links(__DIR__.'/../../recources/Views/Pagination/pagination.php'));
+        $this->assertIsString($this->paginationViews->links('pagination.php'));
+        
+        $container->flush();
     }
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->paginationViews = new PaginationViews('test');
+        $paginator = new Paginator();
+        $paginator->setOptions(PageValue::create(1), PerPageValue::create(10), 25);
+        
+        $this->paginationViews = new PaginationViews('/test/', $paginator);
     }
 }

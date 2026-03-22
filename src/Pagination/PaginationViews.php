@@ -2,33 +2,18 @@
 
 namespace Base\Pagination;
 
-use Base\ValueObjects\Pagination\PageValue;
-use Base\ValueObjects\Pagination\PerPageValue;
-
 /**
  * Класс хранящий представления для отрисовки пагинации.
  */
 final class PaginationViews
 {
+    private readonly string $uri; // Базовый uri пагинации.
     private Paginator $paginator;
     
-    public function __construct(
-            private readonly string $uri // Базовый uri пагинации.
-    ) {
-        $this->paginator = new Paginator();
-    }
-    
-    /**
-     * Задаёт параметры пагинации.
-     * 
-     * @param PageValue $page Номер текущей страницы, заданный в ссылке пагинации.
-     * @param PerPageValue $perPage Число элементов на странице, заданное в ссылке пагинации.
-     * @param int $total Общее число элементов в списке, должно быть вычислено перед применением метода.
-     * @return void
-     */
-    public function setOptions(PageValue $page, PerPageValue $perPage, int $total): void
+    public function __construct(string $uri, Paginator $paginator)
     {
-        $this->paginator->setOptions($page, $perPage, $total);
+        $this->uri = mb_trim($uri, '/');
+        $this->paginator = $paginator;
     }
     
     /**
@@ -79,7 +64,12 @@ final class PaginationViews
     {
         ob_start();
         extract($fields, EXTR_OVERWRITE);
-        require_once $file;
+        
+        $appUrl = mb_trim(config('app_url'), '/');
+        $paginationFolder = mb_trim(config('pagination')->folder, '/');
+        
+        require_once $appUrl.'/'.$paginationFolder.'/'.$file;
+        
         return ob_get_clean();
     }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use Base\Container\Container;
 use Base\Controller\BaseHtmlController;
 use Base\Router\ActionOptions;
 use PHPUnit\Framework\TestCase;
@@ -7,7 +8,6 @@ use PHPUnit\Framework\TestCase;
 class BaseHtmlControllerTest extends TestCase
 {
     private BaseHtmlController $ctrl;
-    private ActionOptions $options;
 
     public function test_renderContent(): void
     {
@@ -41,10 +41,17 @@ class BaseHtmlControllerTest extends TestCase
         $this->assertEquals('begin value a=5 b=x end', $page);
     }
 
+    #[\Override]
     protected function setUp(): void
     {
-        $this->options = new ActionOptions('', '', [], 'tests/Sources/Views/Html/template.php', 'tests/Sources/Views/Html/');
+        Container::getInstance()->set('action', new ActionOptions('', '', [], 'tests/Sources/Views/Html/template.php', 'tests/Sources/Views/Html/'));
         
-        $this->ctrl = new BaseHtmlController($this->options);
+        $this->ctrl = new BaseHtmlController();
+    }
+    
+    #[\Override]
+    protected function tearDown(): void
+    {
+        Container::getInstance()->flush();
     }
 }
