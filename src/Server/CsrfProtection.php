@@ -11,7 +11,7 @@ final class CsrfProtection
     
     public function check(): void
     {
-        if ($this->request->getMethod() === 'POST') {
+        if ($this->request->getMethod() !== 'GET') {
             $token = $this->request->filterInputPost('csrf_token');
             
             if ($token !== $_SESSION['csrf_token']) {

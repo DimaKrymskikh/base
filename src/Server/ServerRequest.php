@@ -14,7 +14,7 @@ final class ServerRequest implements FilterRequestInterface, ServerRequestInterf
 
     public function __construct()
     {
-        $this->method = strtoupper(filter_input(INPUT_SERVER, 'REQUEST_METHOD'));
+        $this->method = strtoupper($this->filterInputPost('request_method') ?: filter_input(INPUT_SERVER, 'REQUEST_METHOD'));
         $this->uri = mb_trim(parse_url(filter_input(INPUT_SERVER, 'REQUEST_URI'), PHP_URL_PATH), '/');
         $this->protocol = filter_input(INPUT_SERVER, 'SERVER_PROTOCOL');
         $this->host = filter_input(INPUT_SERVER, 'HTTP_HOST');
