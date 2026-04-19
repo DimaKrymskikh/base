@@ -43,7 +43,9 @@ final class ExceptionsHandler
         $str .= "Трассировка стека: \n";
 
         foreach ($e->getTrace() as $value) {
-            $str .= "{$value['file']}: стр. {$value['line']}, функ. {$value['function']} \n";
+            $file = $value['file'] ?? '';
+            $line = $value['line'] ?? '';
+            $str .= "$file: стр. $line, функ. {$value['function']} \n";
         }
         
         return $str;
@@ -68,7 +70,9 @@ final class ExceptionsHandler
         $str .= '<div>Трассировка стека:';
 
         foreach ($e->getTrace() as $value) {
-            $str .= "<div>{$value['file']}: стр. {$value['line']}, функ. {$value['function']}</div>";
+            $file = $value['file'] ?? '';
+            $line = $value['line'] ?? '';
+            $str .= "<div>$file: стр. $line, функ. {$value['function']}</div>";
         }
         
         $str .= '</div>';
