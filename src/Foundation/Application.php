@@ -23,7 +23,6 @@ final class Application
         $this->container = Container::getInstance();
         
         $serverRequest = new ServerRequest();
-        (new CsrfProtection($serverRequest))->check();
         $this->container->set('serverRequest', $serverRequest);
         
         $db = new DB(new DBconnection($config->db));
@@ -37,14 +36,10 @@ final class Application
         $loggerService = new LoggerService($finishedConfig->logs, new ClockService(), new FileService());
         $this->container->set('loggerService', $loggerService);
         
-        set_exception_handler([new ExceptionsHandler($loggerService, $serverRequest, $db), 'handle']);
-    }
-    
-    public function withAssetsLogs(): void
-    {
-        $loggerService = $this->container->get('loggerService');
-        $serverRequest = $this->container->get('serverRequest');
-        
+        // Записываем внешние данные.
         $loggerService->info($serverRequest->getGlobalArraysAsString());
+        
+        set_exception_handler([new ExceptionsHandler($loggerService, $serverRequest, $db), 'handle']);
+        (new CsrfProtection($serverRequest))->check();
     }
 }

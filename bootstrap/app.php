@@ -27,6 +27,4 @@ if(!isset($config->app_url)) {
     exit('В конфигурации не задан url приложения');
 }
 
-$app = new Application($config);
-
-$app->withAssetsLogs();
+new Application($config);
