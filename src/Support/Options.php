@@ -4,16 +4,29 @@ namespace Base\Support;
 
 use Base\Contracts\Constants\DefaultConfig;
 
-readonly class Options
+/**
+ * Задаёт конфигурацию приложения.
+ */
+final readonly class Options
 {
+    /**
+     * Конфигурация приложения.
+     * 
+     * @var object
+     */
     public object $config;
     
+    /**
+     * Обрабатывает настройки конфигурации.
+     * 
+     * @param object $config
+     */
     public function __construct(object $config)
     {
-        $this->config = $this->setBaseOptions($config);
+        $this->config = $this->setOptions($config);
     }
     
-    private function setBaseOptions(object $config): object
+    private function setOptions(object $config): object
     {
         $appConfig = (object) [];
         
@@ -25,6 +38,8 @@ readonly class Options
             $appConfig->error_router,
             $appConfig->routes_file,
         ] = $this->setMainOptions($config);
+        
+        $appConfig->db = $config->db;
         
         // Сохраняем поле modules
         $appConfig->modules = $config->modules ?? [];

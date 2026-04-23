@@ -10,10 +10,11 @@ class RequestModuleTest extends TestCase
 {
     private object $config;
     private ServerRequestInterface $serverRequest;
+    private object $db;
     
     public function test_default_config(): void
     {
-        $this->config = (new Options(Config::getDefaultConfig()))->config;
+        $this->config = (new Options(Config::getDefaultConfig($this->db)))->config;
 
         $this->serverRequest->method('getMethod')->willReturn('get');
         $this->serverRequest->method('getUri')->willReturn('test');
@@ -30,7 +31,7 @@ class RequestModuleTest extends TestCase
     
     public function test_config_without_modules(): void
     {
-        $this->config = (new Options( Config::getConfigWithoutModules() ))->config;
+        $this->config = (new Options( Config::getConfigWithoutModules($this->db) ))->config;
         
         $this->serverRequest->method('getMethod')->willReturn('post');
         $this->serverRequest->method('getUri')->willReturn('test');
@@ -47,7 +48,7 @@ class RequestModuleTest extends TestCase
     
     public function test_config_with_modules_case_requestmodule_has_general_options(): void
     {
-        $this->config = (new Options( Config::getConfigWithModules() ))->config;
+        $this->config = (new Options( Config::getConfigWithModules($this->db) ))->config;
         
         $this->serverRequest->method('getMethod')->willReturn('put');
         $this->serverRequest->method('getUri')->willReturn('test');
@@ -65,7 +66,7 @@ class RequestModuleTest extends TestCase
     
     public function test_config_with_modules_case_requestmodule_has_module_options(): void
     {
-        $this->config = (new Options( Config::getConfigWithModules() ))->config;
+        $this->config = (new Options( Config::getConfigWithModules($this->db) ))->config;
         
         $this->serverRequest->method('getMethod')->willReturn('delete');
         $this->serverRequest->method('getUri')->willReturn('one/test');
@@ -81,8 +82,10 @@ class RequestModuleTest extends TestCase
         ], (new RequestModule($this->config, $this->serverRequest))->request);
     }
 
+    #[\Override]
     protected function setUp(): void
     {
+        $this->db = require __DIR__.'/../../config/db.php';
         $this->serverRequest = $this->createStub(ServerRequestInterface::class);
     }
 }

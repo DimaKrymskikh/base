@@ -9,15 +9,16 @@ class Config
         return (object) [];
     }
     
-    public static function getDefaultConfig(): object
+    public static function getDefaultConfig(object $db): object
     {
         return (object)[
             'app_url' => 'test',
             'app_debug' => true,
+            'db' => $db,
         ];
     }
     
-    public static function getConfigWithoutModules(): object
+    public static function getConfigWithoutModules(object $db): object
     {
         return $config = (object)[
             'app_url' => 'test',
@@ -27,10 +28,11 @@ class Config
                 'controller' => 'App\Controllers\DefaultController',
                 'template' => '/Views/Layout/errorTemplate.php',
             ],
+            'db' => $db,
         ];
     }
     
-    public static function getConfigWithModules(): object
+    public static function getConfigWithModules(object $db): object
     {
         return $config = (object)[
             'app_url' => 'test',
@@ -49,11 +51,12 @@ class Config
                     'views_folder' => '/app/ModuleTwo/Views/',
                     'template' => '/app/ModuleTwo/Views/template.php',
                 ],
-            ]
+            ],
+            'db' => $db,
         ];
     }
     
-    public static function getConfigWithLogs(): object
+    public static function getConfigWithLogs(object $db): object
     {
         return $config = (object)[
             'app_url' => 'test',
@@ -66,7 +69,8 @@ class Config
                     'folder' => '/storage/logs/errors',
                     'file' => 'err',
                 ]
-            ]
+            ],
+            'db' => $db,
         ];
     }
 }

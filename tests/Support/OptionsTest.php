@@ -7,6 +7,8 @@ use Tests\Sources\config\Config;
 
 class OptionsTest extends TestCase
 {
+    private object $db;
+    
     /**
      * Задан только url приложения
      * 
@@ -39,8 +41,9 @@ class OptionsTest extends TestCase
                     'folder' => DefaultConfig::LogsErrorsFolder->value,
                     'file' => DefaultConfig::LogsErrorsFile->value,
                 ]
-            ]
-        ], (new Options(Config::getDefaultConfig()))->config);
+            ],
+            'db' => $this->db,
+        ], (new Options(Config::getDefaultConfig($this->db)))->config);
     }
     
     public function test_config_without_modules(): void
@@ -70,8 +73,9 @@ class OptionsTest extends TestCase
                     'folder' => DefaultConfig::LogsErrorsFolder->value,
                     'file' => DefaultConfig::LogsErrorsFile->value,
                 ]
-            ]
-        ], (new Options( Config::getConfigWithoutModules() ))->config);
+            ],
+            'db' => $this->db,
+        ], (new Options( Config::getConfigWithoutModules($this->db) ))->config);
     }
     
     public function test_config_with_modules(): void
@@ -111,8 +115,9 @@ class OptionsTest extends TestCase
                     'folder' => DefaultConfig::LogsErrorsFolder->value,
                     'file' => DefaultConfig::LogsErrorsFile->value,
                 ]
-            ]
-        ], (new Options( Config::getConfigWithModules() ))->config);
+            ],
+            'db' => $this->db,
+        ], (new Options( Config::getConfigWithModules($this->db) ))->config);
     }
     
     public function test_config_with_logs(): void
@@ -142,7 +147,14 @@ class OptionsTest extends TestCase
                     'folder' => '/storage/logs/errors',
                     'file' => 'err',
                 ]
-            ]
-        ], (new Options(Config::getConfigWithLogs()))->config);
+            ],
+            'db' => $this->db,
+        ], (new Options(Config::getConfigWithLogs($this->db)))->config);
+    }
+
+    #[\Override]
+    protected function setUp(): void
+    {
+        $this->db = require __DIR__.'/../../config/db.php';
     }
 }

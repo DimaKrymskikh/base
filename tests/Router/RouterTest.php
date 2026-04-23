@@ -14,6 +14,7 @@ class RouterTest extends TestCase
 {
     private Router $router;
     private Container $container;
+    private object $db;
 
     public function test_slash(): void
     {
@@ -188,7 +189,7 @@ class RouterTest extends TestCase
     
     private function runRouters(string $method, string $uri): void
     {
-        $config = (new Options( Config::getConfigWithModules() ))->config;
+        $config = (new Options( Config::getConfigWithModules($this->db) ))->config;
         $serverRequest = $this->createStub(ServerRequestInterface::class);
         
         $serverRequest->method('getMethod')->willReturn($method);
@@ -218,6 +219,7 @@ class RouterTest extends TestCase
     #[\Override]
     protected function setUp(): void
     {
+        $this->db = require __DIR__.'/../../config/db.php';
         $this->container = Container::getInstance();
     }
     

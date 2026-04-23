@@ -28,9 +28,11 @@ class LoggerServiceTest extends TestCase
         $this->logger->error('текст');
     }
 
+    #[\Override]
     protected function setUp(): void
     {
-        $logs = Config::getConfigWithLogs()->logs;
+        $db = require __DIR__.'/../../config/db.php';
+        $logs = Config::getConfigWithLogs($db)->logs;
         
         $this->clock = $this->createStub(ClockInterface::class);
         

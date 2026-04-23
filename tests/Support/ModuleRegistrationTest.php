@@ -7,9 +7,11 @@ use Tests\Sources\config\Config;
 
 class ModuleRegistrationTest extends TestCase
 {
+    private object $db;
+    
     public function test_default_config(): void
     {
-        $config = (new Options(Config::getDefaultConfig()))->config;
+        $config = (new Options(Config::getDefaultConfig($this->db)))->config;
         
         $this->assertEquals((object) [
             'template' => '/Views/template.php',
@@ -19,7 +21,7 @@ class ModuleRegistrationTest extends TestCase
     
     public function test_config_without_modules(): void
     {
-        $config = (new Options( Config::getConfigWithoutModules() ))->config;
+        $config = (new Options( Config::getConfigWithoutModules($this->db) ))->config;
         
         $this->assertEquals((object) [
             'template' => '/Views/Layout/template.php',
@@ -29,7 +31,7 @@ class ModuleRegistrationTest extends TestCase
     
     public function test_config_with_modules(): void
     {
-        $config = (new Options( Config::getConfigWithModules() ))->config;
+        $config = (new Options( Config::getConfigWithModules($this->db) ))->config;
         
         // Возвращаются общие параметры, т.к. ни один 'pattern' модулей не содержится в uri запроса (uri = 'test')
         $this->assertEquals((object) [
@@ -42,5 +44,11 @@ class ModuleRegistrationTest extends TestCase
             'template' => '/app/ModuleTwo/Views/template.php',
             'views_folder' => '/app/ModuleTwo/Views/',
         ], (new ModuleRegistration($config, 'two/test'))->getRequestModule());
+    }
+
+    #[\Override]
+    protected function setUp(): void
+    {
+        $this->db = require __DIR__.'/../../config/db.php';
     }
 }
