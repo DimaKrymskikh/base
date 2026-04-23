@@ -41,11 +41,12 @@ final class Paginator
         $this->total = $total;
         $this->perPage = $perPage->value;
         $this->pagesNumber = (int) ceil($total / $perPage->value);
-        // При удалении элементов страниц может стать меньше, поэтому нужен min
-        $this->currentPage = min($page->value, $this->pagesNumber);
+        // При удалении элементов страниц может стать меньше
+        $this->currentPage = $page->value < $this->pagesNumber ? $page->value : $this->pagesNumber;
         // При удалении элементов, например, удаляется единственный элемент, 
-        // offset может стать отрицательным, поэтому нужен max
-        $this->offset = max(self::PAGINATOR_DEFAULT_OFFSET, ($this->currentPage - 1) * $perPage->value);
+        // offset может стать отрицательным
+        $offset = ($this->currentPage - 1) * $perPage->value;
+        $this->offset = $offset < 0 ? self::PAGINATOR_DEFAULT_OFFSET : $offset;
     }
     
     public function getTotal(): int

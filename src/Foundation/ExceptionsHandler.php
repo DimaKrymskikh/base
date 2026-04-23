@@ -4,24 +4,27 @@ namespace Base\Foundation;
 
 use Base\Exceptions\HtmlExceptionInterface;
 use Base\Server\ServerRequestInterface;
-use Base\Support\DB\DB;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Глобальный обработчик исключений.
+ */
 final class ExceptionsHandler
 {
     public function __construct(
-            private LoggerInterface $loggerService,
+            private LoggerInterface $logger,
             private ServerRequestInterface $request,
-            private DB $db,
     ) {
     }
     
+    /**
+     * Перехватывает исключения.
+     * 
+     * @param \Throwable $e
+     * @return void
+     */
     public function handle(\Throwable $e): void
     {
-        if($this->db->inTransaction()) {
-            $this->db->rollBack();
-        }
-        
         if($e instanceof HtmlExceptionInterface) {
             $e->render($this->request);
             return;
@@ -30,10 +33,16 @@ final class ExceptionsHandler
         if(config('app_debug')) {
             echo $this->getHtmlMessage($e);
         } else {
-            $this->loggerService->error($this->getLogMessage($e));
+            $this->logger->error($this->getLogMessage($e));
         }
     }
     
+    /**
+     * Запись трассировки ошибки в журнал (production).
+     * 
+     * @param \Throwable $e
+     * @return string
+     */
     private function getLogMessage(\Throwable $e): string
     {
         $str = "Код: {$e->getCode()} \n";
@@ -41,16 +50,22 @@ final class ExceptionsHandler
         $str .= "Ошибка произошла в файле {$e->getFile()} в строке {$e->getLine()} \n";
         
         $str .= "Трассировка стека: \n";
-
-        foreach ($e->getTrace() as $value) {
+        
+        array_map(function($value) use (&$str) {
             $file = $value['file'] ?? '';
             $line = $value['line'] ?? '';
             $str .= "$file: стр. $line, функ. {$value['function']} \n";
-        }
+        }, $e->getTrace());
         
         return $str;
     }
     
+    /**
+     * Вывод трассировки ошибки в монитор (development).
+     * 
+     * @param \Throwable $e
+     * @return string
+     */
     private function getHtmlMessage(\Throwable $e): string
     {
         $str = <<<HTML
@@ -69,11 +84,11 @@ final class ExceptionsHandler
                 
         $str .= '<div>Трассировка стека:';
 
-        foreach ($e->getTrace() as $value) {
+        array_map(function($value) use (&$str) {
             $file = $value['file'] ?? '';
             $line = $value['line'] ?? '';
             $str .= "<div>$file: стр. $line, функ. {$value['function']}</div>";
-        }
+        }, $e->getTrace());
         
         $str .= '</div>';
         

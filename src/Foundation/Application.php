@@ -9,7 +9,7 @@ use Base\Services\ClockService;
 use Base\Services\FileService;
 use Base\Services\LoggerService;
 use Base\Support\DB\DB;
-use Base\Support\DB\DBconnection;
+use Base\Support\DB\DBhandle;
 use Base\Support\Options;
 use Base\Support\RequestModule;
 
@@ -24,9 +24,6 @@ final class Application
         
         $serverRequest = new ServerRequest();
         $this->container->set('serverRequest', $serverRequest);
-        
-        $db = new DB(new DBconnection($config->db));
-        $this->container->set('db', $db);
 
         $finishedConfig = (new Options($config))->config;
         $this->container->set('config', $finishedConfig);
@@ -39,7 +36,10 @@ final class Application
         // Записываем внешние данные.
         $loggerService->info($serverRequest->getGlobalArraysAsString());
         
-        set_exception_handler([new ExceptionsHandler($loggerService, $serverRequest, $db), 'handle']);
+        set_exception_handler([new ExceptionsHandler($loggerService, $serverRequest), 'handle']);
+        
         (new CsrfProtection($serverRequest))->check();
+        
+        $this->container->set('db', new DB(DBhandle::getInstance()));
     }
 }

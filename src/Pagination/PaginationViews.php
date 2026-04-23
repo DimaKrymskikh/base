@@ -31,9 +31,9 @@ final class PaginationViews
         
         $uri = "/$this->uri?page=$page&per_page=$perPage";
         
-        foreach ($fields as $name => $value) {
+        array_walk($fields, function($value, $name) use (&$uri) {
             $uri .= "&$name=$value";
-        }
+        });
         
         return <<<HTML
                     <a href="$uri"> $letter </a>

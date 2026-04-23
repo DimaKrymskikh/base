@@ -2,29 +2,32 @@
 
 namespace Base\Support\DB;
 
+/**
+ * Класс с методами, выполняющими запрос в базу данных.
+ */
 final class DB
 {
-    public const ERR_MESSAGE_MULTIPLE_FIELDS = "В запросе извлекается несколько полей";
-    public const ERR_MESSAGE_MULTIPLE_LINES = "Запрос извлекает более одной строки";
+    public const ERR_MESSAGE_FAIL_EXECUTE = "При выполнении подготовленного запроса произошла ошибка.";
+    public const ERR_MESSAGE_MULTIPLE_FIELDS = "В запросе извлекается несколько полей.";
+    public const ERR_MESSAGE_MULTIPLE_LINES = "Запрос извлекает более одной строки.";
     
     private \PDO $dbh;
     
-    public function __construct(DBconnection $DBconnection)
+    public function __construct(DBhandle $dbHandle)
     {
-        $this->dbh = $DBconnection->dbh;
+        $this->dbh = $dbHandle->dbh;
     }
 
     /**
      * Применяется при выполнении запросов INSERT, UPDATE или DELETE без извлечения данных из базы.
      * 
      * @param string $sql
-     * @param array $param
+     * @param array $params
      * @return void
      */
-    public function execute(string $sql, array $param): void
+    public function execute(string $sql, array $params): void
     {
-        $sth = $this->dbh->prepare($sql);
-        $sth->execute($param);
+        $this->prepareAndExecute($sql, $params);
     }
 
     /**
@@ -38,11 +41,15 @@ final class DB
      */
     public function selectValue(string $sql, array $params): string
     {
-        $sth = $this->dbh->prepare($sql);
-        $sth->execute($params);
+        $sth = $this->prepareAndExecute($sql, $params);
         $result = $sth->fetch(\PDO::FETCH_NUM);
-
-        if (is_array($result) && count($result) !== 1) {
+        
+        if (!$result) {
+            // Если запрос не извлёк ни одной строки, возвращаем пустую строку
+            return '';
+        }
+        
+        if(count($result) > 1) {
             throw new \Exception(self::ERR_MESSAGE_MULTIPLE_FIELDS);
         }
 
@@ -51,22 +58,20 @@ final class DB
             throw new \Exception(self::ERR_MESSAGE_MULTIPLE_LINES);
         }
 
-        // Если запрос извлёк одну строку, возвращаем величину извлечённого поля.
-        // Если запрос не извлёк ни одной строки, возвращаем пустую строку
-        return isset($result[0]) ? $result[0] : '';
+        // Если запрос извлёк одну строку с одной величиной, возвращаем величину извлечённого поля.
+        return $result[0];
     }
 
     /**
      * Из базы данных извлекается одна строка в виде std-объекта.
      * 
      * @param string $sql
-     * @param array $param
+     * @param array $params
      * @return object
      */
-    public function selectObject(string $sql, array $param): object
+    public function selectObject(string $sql, array $params): object
     {
-        $sth = $this->dbh->prepare($sql);
-        $sth->execute($param);
+        $sth = $this->prepareAndExecute($sql, $params);
         $result = $sth->fetch(\PDO::FETCH_OBJ);
         return $result ?: (object)[];
     }
@@ -75,53 +80,20 @@ final class DB
      * Из базы данных извлекается несколько строк в виде массива std-объектов.
      * 
      * @param string $sql
-     * @param array $param
+     * @param array $params
      * @return array
      */
-    public function selectObjects(string $sql, array $param): array
+    public function selectObjects(string $sql, array $params): array
     {
-        $sth = $this->dbh->prepare($sql);
-        $sth->execute($param);
+        $sth = $this->prepareAndExecute($sql, $params);
         return $sth->fetchAll(\PDO::FETCH_OBJ) ?: [];
     }
     
-    /**
-     * Инициализация транзакции.
-     * 
-     * @return bool true, если выполнилась успешно, или false, если возникла ошибка.
-     */
-    public function beginTransaction(): bool
+    private function prepareAndExecute(string $sql, array $params): \PDOStatement
     {
-        return $this->dbh->beginTransaction();
-    }
-    
-    /**
-     * Фиксирует транзакцию.
-     * 
-     * @return bool true, если выполнилась успешно, или false, если возникла ошибка.
-     */
-    public function commit(): bool
-    {
-        return $this->dbh->commit();
-    }
-    
-    /**
-     * Откат транзакции.
-     * 
-     * @return bool true, если выполнилась успешно, или false, если возникла ошибка.
-     */
-    public function rollBack(): bool
-    {
-        return $this->dbh->rollBack();
-    }
-    
-    /**
-     * Проверяет, начата ли транзакция
-     * 
-     * @return bool true, если транзакция в данный момент активна и false, если нет.
-     */
-    public function inTransaction(): bool
-    {
-        return $this->dbh->inTransaction();
+        $sth = $this->dbh->prepare($sql);
+        $sth->execute($params);
+        
+        return $sth;
     }
 }
