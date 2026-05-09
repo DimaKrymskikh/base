@@ -42,13 +42,13 @@ final class ServerRequest implements FilterRequestInterface, ServerRequestInterf
     #[\Override]
     public function filterInputGet(string $name): string
     {
-        return filter_input(INPUT_GET, $name) ?: '';
+        return filter_input(INPUT_GET, $name) ?? '';
     }
 
     #[\Override]
     public function filterInputPost(string $name): string
     {
-        return filter_input(INPUT_POST, $name) ?: '';
+        return filter_input(INPUT_POST, $name) ?? '';
     }
     
     /**
