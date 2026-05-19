@@ -24,12 +24,7 @@ final class ModuleRegistration
 
         // Если в конфигурации приложения заданы модули, находим модуль, соответствующий запросу
         if(is_array($modules)) {
-            foreach ($modules as $module) {
-                if(stripos($this->uri, trim($module->pattern, '/')) === 0) {
-                    $givenModul = $module;
-                    break;
-                }
-            }
+            $givenModul = array_find($modules, fn (object $module) => mb_stripos($this->uri, mb_trim($module->pattern, '/')) === 0);
         }
 
         // Если в модуле не определено какое-то поле, берём главное поле конфигурации

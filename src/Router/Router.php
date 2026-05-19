@@ -28,57 +28,40 @@ final class Router
         
         $requestUri = explode('/', mb_trim($requestModule->uri, '/'));
         
-        // Перебираем все возможные маршруты до первого найденного
-        foreach ($this->routers as $router) {
-            // Методы запроса должны совпадать
-            if (mb_strtolower($requestModule->method) !== mb_strtolower($router->method)) {
-                continue;
-            }
-            // Разбитые на части полученный $uri и паттерн должны иметь равное число частей
-            if (count($requestUri) !== count($router->patternChunks)) {
-                continue;
-            }
-            // Сравнивая части $uri и паттерна, находим аргументы экшена
-            $nCoincidence = 0;
-            foreach ($router->patternChunks as $key => $part) {
-                // Если часть паттерна заключена в фигурные скобки, то соответствующая часть $uri - аргумент экшена
-                if (str_starts_with($part, '{') && str_ends_with($part, '}')) {
-                    $router->pushActionArguments($requestUri[$key]);
-                    $nCoincidence++;
-                    // Если часть паттерна без фигурных скобок, то она должна равняться соответствующей части $uri
-                } elseif ($router->patternChunks[$key] === $requestUri[$key]) {
-                    $nCoincidence++;
-                }
-            }
+        // Из всех возможных маршрутов находим нужный, если он существует.
+        $router = array_find($this->routers, function (RouterOptions $router) use ($requestModule, $requestUri) {
+            return mb_strtolower($requestModule->method) === mb_strtolower($router->method) && // Методы должны совпадать.
+                count($requestUri) === count($router->patternChunks) && // Разбитые на части полученный $uri и паттерн должны иметь равное число частей.
+                $router->getNumberOfMatches($requestUri) === count($router->patternChunks); // По всем частям $uri и паттерна найдены совпадения.
+        });
+        
+        if (isset($router)) {
             // Если по всем частям $uri и паттерна найдены совпадения, то добавляем в контейнер контроллер маршрута
             // и данные, необходимые этому контроллеру
-            if ($nCoincidence === count($router->patternChunks)) {
-                $this->container->set(
-                        'action',
-                        new ActionOptions(
-                            $router->controller,
-                            $router->action,
-                            $router->getActionArguments(),
-                            $appUri.$requestModule->module->template,
-                            $appUri.$requestModule->module->views_folder,
-                        )
-                    );
-                return;
-            }
+            $this->container->set(
+                    'action',
+                    new ActionOptions(
+                        $router->controller,
+                        $router->action,
+                        $router->getActionArguments(),
+                        $appUri.$requestModule->module->template,
+                        $appUri.$requestModule->module->views_folder,
+                    )
+                );
+        } else {
+            // Если по всем частям $uri и паттерна не найдены совпадения, то добавляем в контейнер контроллер для ошибок
+            // и данные, необходимые этому контроллеру
+            $this->container->set(
+                    'action',
+                    new ActionOptions(
+                        $config->error_router->controller,
+                        $config->error_router->action,
+                        ['Страница не найдена'],
+                        $appUri.$config->error_router->template,
+                        $appUri.$config->error_router->views_folder,
+                    )
+                );
         }
-        
-        // Если по всем частям $uri и паттерна не найдены совпадения, то добавляем в контейнер контроллер для ошибок
-        // и данные, необходимые этому контроллеру
-        $this->container->set(
-                'action',
-                new ActionOptions(
-                    $config->error_router->controller,
-                    $config->error_router->action,
-                    ['Страница не найдена'],
-                    $appUri.$config->error_router->template,
-                    $appUri.$config->error_router->views_folder,
-                )
-            );
     }
 
     /**

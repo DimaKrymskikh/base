@@ -20,6 +20,9 @@ final class LoggerService extends AbstractLogger
         $this->fileService = $fileService;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     #[\Override]
     public function log($level, string|\Stringable $message, array $context = []): void
     {
@@ -35,26 +38,37 @@ final class LoggerService extends AbstractLogger
         $this->fileService->put($file, $text, FILE_APPEND);
     }
     
+    /**
+     * По уровню ошибки определяет файл журнала.
+     * 
+     * @param string $level
+     * @return string
+     */
     private function getLogFile(string $level): string
     {
         return match ($level) {
             LogLevel::INFO => $this->logs->assets->folder.'/'.$this->logs->assets->file,
-            LogLevel::ERROR => $this->logs->errors->folder.'/'.$this->logs->errors->file,
+            default => $this->logs->errors->folder.'/'.$this->logs->errors->file,
         };
     }
     
+    /**
+     * В шаблон сообщения вставляет нужные значения.
+     * 
+     * @param type $message
+     * @param array $context
+     * @return string
+     */
     private function interpolate($message, array $context = []): string
     {
-        // build a replacement array with braces around the context keys
         $replace = [];
-        foreach ($context as $key => $val) {
-            // check that the value can be cast to string
-            if (!is_array($val) && (!is_object($val) || method_exists($val, '__toString'))) {
-                $replace['{'.$key.'}'] = $val;
+        
+        array_walk($context, function($val, $key) use (&$replace) {
+            if(is_string($val)) {
+                $replace['{{ '.$key.' }}'] = $val;
             }
-        }
+        });
 
-        // interpolate replacement values into the message and return
-        return strtr($message, $replace);
+        return wrapper_strtr($message, $replace);
     }
 }

@@ -27,7 +27,7 @@ readonly class PasswordValue
         $errors = $validationService->validate($stringPassword,  sprintf(self::PASSWORD_OPTIONS, $stringVerification), self::PASSWORD_RULE_MESSAGES);
         
         if (count($errors)) {
-            throw new RuleException('password', implode(' ', $errors));
+            throw new RuleException('password', wrapper_implode(' ', $errors));
         }
         
         $this->value = $stringPassword;

@@ -23,7 +23,7 @@ readonly class LoginValue
         $errors = (new ValidationService())->validate($loginTrim, self::OPTIONS, self::RULE_MESSAGES);
         
         if (count($errors)) {
-            throw new RuleException('login', implode(' ', $errors));
+            throw new RuleException('login', wrapper_implode(' ', $errors));
         }
         
         $this->value = $loginTrim;

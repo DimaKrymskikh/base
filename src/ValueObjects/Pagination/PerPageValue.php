@@ -18,7 +18,7 @@ readonly class PerPageValue
     {
         $intPerPage = intval($perPage);
         
-        if (in_array($intPerPage, Paginator::PAGINATOR_PER_PAGE_LIST, true)) {
+        if (wrapper_in_array($intPerPage, Paginator::PAGINATOR_PER_PAGE_LIST, true)) {
             $this->value = $intPerPage;
             return ;
         }

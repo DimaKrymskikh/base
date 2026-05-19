@@ -20,7 +20,7 @@ final class ValidationService
         
         $errors = [];
         
-        foreach ($rules as $rule) {
+        array_map(function ($rule) use (&$errors, $field, $messages) {
             $params = [];
             if (mb_strpos($rule, ':')) {
                 [$ruleName, $paramStr] = $this->split($rule, ':');
@@ -39,7 +39,7 @@ final class ValidationService
             if (!$pass) {
                 $errors[] = sprintf($messages[$ruleName], $field, ...$params);
             }
-        }
+        }, $rules);
         
         return $errors;
     }
@@ -67,7 +67,7 @@ final class ValidationService
     private function getClassName(string $ruleName): string
     {
         $className = '\Base\Services\Validation\Rules\\'.$ruleName.'Rule';
-        if(!class_exists($className)) {
+        if(!wrapper_class_exists($className)) {
             throw new \LogicException("Задано не существующее правило $ruleName");
         }
         

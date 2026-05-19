@@ -29,4 +29,19 @@ class ArrayUtilsTest extends ArrayUtilsCase
         
         $this->assertEquals('', ArrayUtils::getArrayAsString($arr));
     }
+    
+    public function test_movingIdToArrayKey(): void
+    {
+        [$flat, $complex] = $this->getArraysForMovingIdToArrayKey();
+        
+        $this->assertEquals($complex, ArrayUtils::movingIdToArrayKey($flat, 'ref_id'));
+    }
+    
+    public function test_joinTwoArraysById(): void
+    {
+        $field = 'items';
+        [$results, $contents, $items] = $this->getArraysForJoinTwoArraysById($field);
+        
+        $this->assertEquals($results, ArrayUtils::joinTwoArraysById($contents, $items, 'id', $field));
+    }
 }

@@ -93,4 +93,101 @@ abstract class ArrayUtilsCase extends TestCase
         
         return [$flat, $complex];
     }
+    
+    protected function getArraysForMovingIdToArrayKey(): array
+    {
+        $flat = [
+                (object) [
+                    'id' => 1,
+                    'title' => 'aaa',
+                    'description' => 'qqqqq',
+                    'ref_id' => 10,
+                ],
+                (object) [
+                    'id' => 2,
+                    'title' => 'bbb',
+                    'description' => 'zzzzz',
+                    'ref_id' => 20,
+                ],
+                (object) [
+                    'id' => 3,
+                    'title' => 'cc',
+                    'description' => 'xxx',
+                    'ref_id' => 10,
+                ]
+            ];
+        
+        $complex = [
+            10 => [
+                (object) [
+                    'id' => 1,
+                    'title' => 'aaa',
+                    'description' => 'qqqqq',
+                    'ref_id' => 10,
+                ],
+                (object) [
+                    'id' => 3,
+                    'title' => 'cc',
+                    'description' => 'xxx',
+                    'ref_id' => 10,
+                ]
+            ],
+            20 => [
+                (object) [
+                    'id' => 2,
+                    'title' => 'bbb',
+                    'description' => 'zzzzz',
+                    'ref_id' => 20,
+                ],
+            ],
+        ];
+        
+        return [$flat, $complex];
+    }
+    
+    protected function getArraysForJoinTwoArraysById(string $field): array
+    {
+        [$flat, $items] = $this->getArraysForMovingIdToArrayKey();
+        
+        $contents = [
+                (object) [
+                    'id' => 10,
+                    'name' => 'abcde',
+                    'status' => 'bar',
+                ],
+                (object) [
+                    'id' => 20,
+                    'name' => 'rlmn',
+                    'status' => 'foo',
+                ],
+                (object) [
+                    'id' => 30,
+                    'name' => 'oprs',
+                    'status' => 'bar',
+                ],
+            ];
+        
+        $results = [
+                (object) [
+                    'id' => 10,
+                    'name' => 'abcde',
+                    'status' => 'bar',
+                    $field => $items[10]
+                ],
+                (object) [
+                    'id' => 20,
+                    'name' => 'rlmn',
+                    'status' => 'foo',
+                    $field => $items[20]
+                ],
+                (object) [
+                    'id' => 30,
+                    'name' => 'oprs',
+                    'status' => 'bar',
+                    $field => []
+                ],
+            ];
+        
+        return [$results, $contents, $items];
+    }
 }

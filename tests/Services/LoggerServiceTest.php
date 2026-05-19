@@ -28,6 +28,14 @@ class LoggerServiceTest extends TestCase
         $this->logger->error('текст');
     }
 
+    public function test_info_with_context(): void
+    {
+        $this->file->expects($this->once())
+                ->method('put');
+        
+        $this->assertNull($this->logger->error('текст {name}', ['name' => 'статьи']));
+    }
+
     #[\Override]
     protected function setUp(): void
     {

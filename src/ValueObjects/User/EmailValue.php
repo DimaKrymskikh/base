@@ -22,7 +22,7 @@ readonly class EmailValue
         $errors = (new ValidationService())->validate($emailTrim, self::OPTIONS, self::RULE_MESSAGES);
         
         if (count($errors)) {
-            throw new RuleException('email', implode(' ', $errors));
+            throw new RuleException('email', wrapper_implode(' ', $errors));
         }
         
         $this->value = $emailTrim;

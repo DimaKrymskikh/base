@@ -65,4 +65,51 @@ class ArrayUtils
         
         return array_reduce($arr, fn($str, $item) => $str .= $item, '');
     }
+    
+    /**
+     * Из базы данных извлечены строки таблицы (массив $items), в которых присутствует внешний ключ $itemKey.
+     * Функция возвращает массив, у которого ключами являются значения полей $itemKey,
+     * а значениями - массивы, состоящие из std-объектов извлечённых строк, у которых значения полей $itemKey совпадают с ключом.
+     * (См. \Tests\Utils\ArrayUtilsCase::getArraysForMovingIdToArrayKey()).
+     * 
+     * @param array $items Исходный плоский массив со значениями std-объектов.
+     * @param string $itemKey id основной таблицы.
+     * @return array
+     */
+    public static function movingIdToArrayKey(array $items, string $itemKey): array
+    {
+        $newItems = [];
+        
+        array_map(function ($item) use (&$newItems, $itemKey) {
+            if(array_key_exists($item->$itemKey, $newItems)) {
+                $newItems[$item->$itemKey][] = $item;
+            } else {
+                $newItems[$item->$itemKey] = [$item];
+            }
+        }, $items);
+        
+        return $newItems;
+    }
+    
+    /**
+     * Функция применяется к двум массивам, состоящими из std-объектов.
+     * std-объект массива $contents должен содержать поле $contentKey.
+     * Массив $items должен иметь ключ соответствующие полю $contentKey.
+     * Функция возвращает массив $contents, в котором std-объектам добавлено поле $field,
+     * значениями которого являются std-объекты массива $items.
+     * (См. \Tests\Utils\ArrayUtilsCase::getArraysForJoinTwoArraysById()).
+     * 
+     * @param array $contents
+     * @param array $items
+     * @param string $contentKey
+     * @param string $field
+     * @return array
+     */
+    public static function joinTwoArraysById(array $contents, array $items, string $contentKey, string $field): array
+    {
+        return array_map(function ($item) use ($items, $contentKey, $field) {
+                $item->$field = $items[$item->$contentKey] ?? [];
+                return $item;
+            }, $contents);
+    }
 }

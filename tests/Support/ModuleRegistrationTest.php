@@ -1,5 +1,6 @@
 <?php
 
+use Base\Contracts\Constants\DefaultConfig;
 use Base\Support\ModuleRegistration;
 use Base\Support\Options;
 use PHPUnit\Framework\TestCase;
@@ -14,8 +15,8 @@ class ModuleRegistrationTest extends TestCase
         $config = (new Options(Config::getDefaultConfig($this->db)))->config;
         
         $this->assertEquals((object) [
-            'template' => '/Views/template.php',
-            'views_folder' => '/Views/',
+            'template' => DefaultConfig::Template->value,
+            'views_folder' => DefaultConfig::ViewsFolder->value,
         ], (new ModuleRegistration($config, 'test'))->getRequestModule());
     }
     
@@ -25,7 +26,7 @@ class ModuleRegistrationTest extends TestCase
         
         $this->assertEquals((object) [
             'template' => '/Views/Layout/template.php',
-            'views_folder' => '/Views/',
+            'views_folder' => DefaultConfig::ViewsFolder->value,
         ], (new ModuleRegistration($config, 'test'))->getRequestModule());
     }
     
@@ -35,9 +36,15 @@ class ModuleRegistrationTest extends TestCase
         
         // Возвращаются общие параметры, т.к. ни один 'pattern' модулей не содержится в uri запроса (uri = 'test')
         $this->assertEquals((object) [
-            'template' => '/Views/template.php',
+            'template' => DefaultConfig::Template->value,
             'views_folder' => '/Http/Views/',
         ], (new ModuleRegistration($config, 'test'))->getRequestModule());
+        
+        // Возвращаются параметры модуля и дефолтное значение
+        $this->assertEquals((object) [
+            'views_folder' => '/app/ModuleOne/Views/',
+            'template' => DefaultConfig::Template->value,
+        ], (new ModuleRegistration($config, 'one/test'))->getRequestModule());
         
         // Возвращаются параметры модуля
         $this->assertEquals((object) [
